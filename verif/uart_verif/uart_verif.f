@@ -1,0 +1,10 @@
+$(PRMCU_PATH)/verif/uart_verif/uart_item.sv
+$(PRMCU_PATH)/verif/uart_verif/uart_if.sv
+$(PRMCU_PATH)/verif/uart_verif/mailbox.sv
+$(PRMCU_PATH)/verif/uart_verif/driver.sv
+$(PRMCU_PATH)/verif/uart_verif/generator.sv
+$(PRMCU_PATH)/verif/uart_verif/monitor.sv
+$(PRMCU_PATH)/verif/uart_verif/scoreboard.sv
+$(PRMCU_PATH)/verif/uart_verif/env.sv
+$(PRMCU_PATH)/verif/uart_verif/test.sv
+$(PRMCU_PATH)/verif/uart_verif/tb_top.sv

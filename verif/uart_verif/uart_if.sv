@@ -1,5 +1,6 @@
-interface uart_if(input bit clk);
+class uart_if;
 	
+	logic       clk;
 	logic       internal_clk;
 	logic       rst;
 
@@ -21,4 +22,4 @@ interface uart_if(input bit clk);
 
 	logic       tx;
 	logic       rx;
-endinterface
+endclass

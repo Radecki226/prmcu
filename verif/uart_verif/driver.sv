@@ -1,5 +1,5 @@
 class driver;
-	virtual uart_if uif;
+	uart_if uif;
 	event drv_done;
 	mailbox drv_mbx;
 
