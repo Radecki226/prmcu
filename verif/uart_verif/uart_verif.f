@@ -1,3 +1,4 @@
+$(PRMCU_PATH)/verif/uart_verif/my_event.sv
 $(PRMCU_PATH)/verif/uart_verif/uart_item.sv
 $(PRMCU_PATH)/verif/uart_verif/uart_if.sv
 $(PRMCU_PATH)/verif/uart_verif/mailbox.sv

@@ -1,5 +1,6 @@
 class monitor;
-	virtual uart_if uif;
+	uart_if uif;
+	uart_item item_dat_in, item_tx;
 	/*first mailbox for input(in_dat), second for output(tx)*/
 	mailbox scb_mbx_tx, scb_mbx_in_dat;
 	
@@ -16,7 +17,7 @@ class monitor;
 			@(posedge uif.clk);
 			/*when axi handshake takes place transaction is happening*/
 			if(!uif.rst & uif.in_vld & uif.in_rdy) begin
-				uart_item item = new;
+				item_in_dat = new;
 				item.in_dat = uif.in_dat;
 				item.in_overhead[2] = uif.n_parity_bits;
 				item.in_overhead[1:0] = uif.n_stop_bits;
@@ -32,16 +33,18 @@ class monitor;
 			@(posedge uif.internal_clk);
 			/*when start bit detected start transmission*/
 			if (!uif.rst & !uif.tx) begin
-				bit[8:0] tx_data_buffer = 0;
-				bit[1:0] tx_stop_buffer = 0;
-				bit      tx_parity_buffer = 0;
-				uart_item item = new;
-
+				//bit[8:0] tx_data_buffer = 0;
+				//bit[1:0] tx_stop_buffer = 0;
+				//bit      tx_parity_buffer = 0;
+				//item_tx = new;
+				@posedge(uif.internal_clk);
 				/*get correcnt number of bits to buffer*/
-				for (int i = 0; i < uif.n_data_bits; i++) begin
-					@posedge(uif.internal_clk);
-					tx_buffer[i] = uif.tx;
-				end
+				//int i = 0;
+				//repeat(int(uif.n_data_bits)) begin
+				//	@posedge(uif.internal_clk);
+				//	tx_buffer[i] = uif.tx;
+				//end
+				/*
 				for (int i = 0; i < uif.n_parity_bits; i++) begin
 					@posedge(uif.internal_clk);
 					tx_parity_buffer = uif.tx;
@@ -58,6 +61,7 @@ class monitor;
 
 				scb_mbx_tx.put(item);
 				item.print("Monitor_tx");
+				*/
 			end
 		end
 	endtask

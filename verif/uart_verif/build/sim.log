@@ -1,0 +1,11 @@
+iverilog -g2012 -o build /home/pr/Desktop/fpga/prmcu/src/prmcu_uart/prmcu_uart_top.vhd  /home/pr/Desktop/fpga/prmcu/verif/uart_verif/uart_tb.sv
+vvp build
+VCD info: dumpfile dump.vcd opened for output.
+VCD warning: $dumpvars: Package ($unit) is not dumpable with VCD.
+VCD warning: /home/pr/Desktop/fpga/prmcu/verif/uart_verif/uart_ $dumpfile called after $dumpvars started,
+                                                                using existing file (dump.vcd).
+T=100000000 [Scoreboard] ERROR! Not all data has been captured. Captured frames: 0
+Sumlation FAILED!
+/home/pr/Desktop/fpga/prmcu/verif/uart_verif/uart_tb.sv:96: $finish called at 1000100000 (1ps)
+gtkwave dump.vcd
+WM Destroy

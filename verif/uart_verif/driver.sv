@@ -1,6 +1,6 @@
 class driver;
 	uart_if uif;
-	event drv_done;
+	my_event drv_done;
 	mailbox drv_mbx;
 
 	task run_transmit();
@@ -30,8 +30,9 @@ class driver;
 			while(!uif.in_rdy)
 
 			@(posedge uif.clk);
-			uif.vld <= 0; -> drv_done; 
+			uif.vld <= 0;
+			drv_done.trigger();
 		end
-	end task
-end class
+	endtask
+endclass
 
