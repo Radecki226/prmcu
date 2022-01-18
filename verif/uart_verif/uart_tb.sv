@@ -122,7 +122,20 @@ module tb;
 		for (int i = 0; i < n_writes; i++) begin
 			@(posedge clk & in_vld == 1 & in_rdy == 1)
 			in_dat_buffer[i] = in_dat;
-			in_overhead_buffer[i] = {n_parity_bits, n_stop_bits};
+			/*parity*/
+			if (n_parity_bits == 1) begin
+				in_overhead_buffer[i][2] = ^in_dat;
+			end else begin
+				in_overhead_buffer[i][2] = 0;
+			end
+			
+			/*stop bits*/
+			if (n_stop_bits == 2) begin 
+				in_overhead_buffer[i][1:0] = 2'b11;
+			end else 
+				in_overhead_buffer[i][1:0] = 2'b10;
+			end
+
 		end
 	end
 

@@ -1,0 +1,199 @@
+-----------------------------------------------------------------
+-- Name        : prmcu_uart_transmitter.vhdl
+-----------------------------------------------------------------
+-- Description : Module designed to serve as uart transmitter.
+-----------------------------------------------------------------
+-- Author      : Piotr Radecki
+-----------------------------------------------------------------
+-- Edited      : January 2022
+-----------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity prmcu_uart_transmitter is 
+	port(
+		clk                    : in  std_logic;
+		internal_clk_divider_i : in  std_logic_vector(7 downto 0);
+		rst                    : in  std_logic;
+		tx_en                  : in  std_logic;
+		n_parity_bits_i        : in  std_logic;
+		n_stop_bits_i          : in  std_logic_vector(1 downto 0);
+		n_data_bits_i          : in  std_logic_vector(3 downto 0);
+
+		in_dat_i               : in  std_logic_vector(8 downto 0);
+		in_vld_i               : in  std_logic;
+		in_rdy_o               : out std_logic;
+
+		tx_o                   : out std_logic
+	);
+end prmcu_uart_transmitter;
+
+architecture rtl of prmcu_uart_transmitter is
+
+	-- in/out signal copies
+	signal in_dat_r : std_logic_vector(8 downto 0); -- shift register
+	signal in_rdy_s : std_logic;
+	
+	type tx_fsm_t is (IDLE, START, DATA, PARITY, STOP1, STOP2);
+	signal tx_fsm_r : tx_fsm_t;
+
+	-- config signals
+	signal internal_clk_divider_r : std_logic_vector(7 downto 0);
+	signal tx_en_r                : std_logic;
+	signal n_parity_bits_r        : std_logic;
+	signal n_stop_bits_r          : std_logic_vector(1 downto 0);
+	signal n_data_bits_r          : std_logic_vector(3 downto 0);
+	signal parity_bit_r : std_logic;
+
+	-- counters
+	signal dat_counter_r           : unsigned(3 downto 0);
+	signal dat_counter_en          : std_logic;
+
+	signal internal_clk_counter_r  : unsigned(8 downto 0);
+	signal internal_clk_counter_r1 : unsigned(8 downto 0); -- delayed copy
+	signal internal_clk_counter_en : std_logic;
+
+
+begin
+
+	-- internal clock generator
+	internal_clk_counter_p : process(clk)
+	begin
+		if rising_edge(clk) then 
+			if internal_clk_counter_en = '1' then 
+				if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
+					internal_clk_counter_r <= (others => '0');
+				else
+					internal_clk_counter_r <= internal_clk_counter_r + 1;
+				end if;
+			end if;
+
+			if rst = '1' then 
+				internal_clk_counter_r <= (others => '0');
+			end if;
+
+		end if;
+	end process;
+
+	-- FSM registered part
+	tx_fsm_reg_p : process(clk)
+	begin
+		if rising_edge(clk) then 
+			case tx_fsm_r is 
+				
+				when START => 
+					tx_fsm_r <= DATA;
+
+				when DATA =>
+					if 
+					in_dat_r <= '0' & in_dat_r(8 downto 1);
+					if dat_counter_r = unsigned(n_data_bits_r)-1 then 
+						if n_parity_bits_r = '1' then 
+							tx_fsm_r <= PARITY;
+						else 
+							tx_fsm_r <= STOP1;
+						end if;
+
+				when PARITY => 
+					if n_stop_bits = "01" then 
+						tx_fsm_r <= STOP2;
+					else
+						tx_fsm_r < STOP1;
+					end if;
+				
+				when STOP1 =>
+					tx_fsm_r <= STOP2;
+
+				when STOP2 =>
+					if in_vld_i = '1' and in_rdy_s = '1' and uart_en_r = '1' then
+						tx_fsm_r               <= START;
+						in_dat_r               <= in_dat_i;
+						internal_clk_divider_r <= internal_clk_divider_i;
+						tx_en_r                <= tx_en;
+						n_parity_bits_r        <= n_parity_bits;
+						n_stop_bits_r          <= n_stop_bits;
+						n_data_bits_r          <= n_data_bits;
+						parity_bit_r           <= xor in_dat_i;
+					else
+						tx_fsm_r <= IDLE;
+					end if;
+
+				when others => --IDLE
+					if in_vld_i = '1' and in_rdy_s = '1' and uart_en_r = '1' then 
+						tx_fsm_r               <= START;
+						in_dat_r               <= in_dat_i;
+						internal_clk_divider_r <= internal_clk_divider_i;
+						tx_en_r                <= tx_en;
+						n_parity_bits_r        <= n_parity_bits;
+						n_stop_bits_r          <= n_stop_bits;
+						n_data_bits_r          <= n_data_bits;
+						parity_bit_r           <= xor in_dat_i;
+					end if;
+			end case;
+
+			if rst = '1' then 
+				tx_fsm_r <= IDLE;
+			end if;
+
+		end if;
+	end process;
+
+	-- FSM, combinational part
+	tx_fsm_comb_p : process(all)
+	begin
+		case tx_fsm_r is 
+			when START => 
+				tx_o <= '0';
+
+			when DATA => 
+				tx_o <= in_dat_r(0);
+
+			when PARITY => 
+				tx_o <= parity_bit_r;
+
+			when others => 
+				tx_o <= '1';
+
+		end case;
+
+		if tx_fsm_r = STOP2 or tx_fsm_r = IDLE then 
+			in_rdy_s <= '1';
+		else
+			in_rdy_s <= '0';
+		end if;
+
+		if tx_fsm_r = IDLE then 
+			internal_clk_counter_en <= '0';
+		else 
+			internal_clk_counter_en <= '1';
+		end if;
+
+		if tx_fsm_r = DATA then 
+			dat_counter_en <= '1';
+		else
+			dat_counter_en <= '0';
+		end if;
+
+	end process;
+
+	-- counter for data state
+	dat_counter_p : process(clk)
+	begin
+		if rising_edge(clk) then 
+			if dat_counter_en = '1' then
+				if dat_counter_r = unsigned(n_data_bits_r)-1 then
+					dat_counter_r <= (others => '0');
+				else
+					dat_counter_r <= dat_counter_r + 1;
+				end if;
+			end if;
+
+			if rst = '1' then 
+				dat_counter_r <= (others => '0');
+			end if;
+
+		end if;
+	end process;
+

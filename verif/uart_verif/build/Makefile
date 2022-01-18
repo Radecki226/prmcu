@@ -6,10 +6,10 @@ SOURCEFILES=$(wildcard $(SP)/*.vhd)
 
 
 src: $(SOURCEFILES)
-	iverilog -g2012 -o dut -s $(SP)/prmcu_uart_top.vhd
+	iverilog -g2012 -o dut -c $(SP)/prmcu_uart.f
 
 test: $(VERIFFILES)
-	iverilog -g2012 -o build $(SP)/prmcu_uart_top.vhd  $(VP)/uart_tb.sv
+	iverilog -g2012 -o build -s dut  $(VP)/uart_tb.sv
 	vvp build
 	gtkwave dump.vcd
 
