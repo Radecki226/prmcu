@@ -33,8 +33,11 @@ end prmcu_uart_transmitter;
 architecture rtl of prmcu_uart_transmitter is
 
 	-- in/out signal copies
-	signal in_dat_r : std_logic_vector(8 downto 0); -- shift register
-	signal in_rdy_s : std_logic;
+	signal in_mask_s : std_logic_vector(8 downto 0);
+	signal in_dat_s  : std_logic_vector(8 downto 0);
+	signal in_dat_r  : std_logic_vector(8 downto 0); -- shift register
+	signal in_rdy_s  : std_logic;
+
 	
 	type tx_fsm_t is (IDLE, START, DATA, PARITY, STOP1, STOP2);
 	signal tx_fsm_r : tx_fsm_t;
@@ -75,6 +78,24 @@ begin
 
 		end if;
 	end process;
+
+	mask_in_dat_p : process(n_data_bits_i)
+	begin
+		case n_data_bits_i is 
+			when 5 =>
+				in_mask_s <= "000011111";
+			when 6 =>
+				in_mask_s <= "000111111";
+			when 7 =>
+				in_mask_s <= "001111111";
+			when 8 =>
+				in_mask_s <= "011111111";
+			when others => --9
+				in_mask_s <= "111111111";
+		end case;
+	end process;
+
+	in_dat_s <= in_dat_i and in_mask_s;
 
 	-- FSM registered part
 	tx_fsm_reg_p : process(clk)
@@ -118,13 +139,15 @@ begin
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
 						if in_vld_i = '1' and in_rdy_s = '1' and tx_en = '1' then
 							tx_fsm_r               <= START;
-							in_dat_r               <= in_dat_i;
+							in_dat_r               <= in_dat_s;
 							internal_clk_divider_r <= internal_clk_divider_i;
-							n_parity_bits_r        <= n_parity_bits;
-							n_stop_bits_r          <= n_stop_bits;
-							n_data_bits_r          <= n_data_bits;
-							for i in 0 to n_data_bits_r-1 loop
-								parity_bit_v := parity_bit_v xor in_dat_i(i);
+							n_parity_bits_r        <= n_parity_bits_i;
+							n_stop_bits_r          <= n_stop_bits_i;
+							n_data_bits_r          <= n_data_bits_i;
+							parity_bit_r           <= '0';
+
+							for i in 0 to 8 loop
+								parity_bit_v := parity_bit_v xor in_dat_s(i);
 							end loop;
 							parity_bit_r <= parity_bit_v;
 
@@ -136,15 +159,15 @@ begin
 				when others => --IDLE
 					if in_vld_i = '1' and in_rdy_s = '1' and tx_en = '1' then 
 						tx_fsm_r               <= START;
-						in_dat_r               <= in_dat_i;
+						in_dat_r               <= in_dat_s;
 						internal_clk_divider_r <= internal_clk_divider_i;
-						n_parity_bits_r        <= n_parity_bits;
-						n_stop_bits_r          <= n_stop_bits;
-						n_data_bits_r          <= n_data_bits;
+						n_parity_bits_r        <= n_parity_bits_i;
+						n_stop_bits_r          <= n_stop_bits_i;
+						n_data_bits_r          <= n_data_bits_i;
 						parity_bit_r           <= '0';
 						
-						for i in 0 to n_data_bits_r-1 loop
-							parity_bit_v := parity_bit_v xor in_dat_i(i);
+						for i in 0 to 8 loop
+							parity_bit_v := parity_bit_v xor in_dat_s(i);
 						end loop;
 						parity_bit_r <= parity_bit_v;
 
@@ -159,7 +182,7 @@ begin
 	end process;
 
 	-- FSM, combinational part
-	tx_fsm_comb_p : process(all)
+	tx_fsm_comb_p : process(tx_fsm_r)
 	begin
 		case tx_fsm_r is 
 			when START => 

@@ -1,15 +1,15 @@
 VP=$(PRMCU_PATH)/verif/uart_verif
 SP=$(PRMCU_PATH)/src/prmcu_uart
 VERIFFILES=$(wildcard $(VP)/*.sv)
-SOURCEFILES=$(wildcard $(SP)/*.vhd)
+SOURCEFILES=$(wildcard $(SP)/*.vhd) $(SP)/build/design.o
 
 
 
 src: $(SOURCEFILES)
-	iverilog -g2012 -o dut -c $(SP)/prmcu_uart.f
+	cd $(SP)/build make all 
 
 test: $(VERIFFILES)
-	iverilog -g2012 -o build -s dut  $(VP)/uart_tb.sv
+	iverilog -g2012 -o build  $(SP)/prmcu_uart_top.vhd $(VP)/uart_tb.sv
 	vvp build
 	gtkwave dump.vcd
 
