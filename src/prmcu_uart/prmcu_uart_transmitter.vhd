@@ -41,7 +41,6 @@ architecture rtl of prmcu_uart_transmitter is
 
 	-- config signals
 	signal internal_clk_divider_r : std_logic_vector(7 downto 0);
-	signal tx_en_r                : std_logic;
 	signal n_parity_bits_r        : std_logic;
 	signal n_stop_bits_r          : std_logic_vector(1 downto 0);
 	signal n_data_bits_r          : std_logic_vector(3 downto 0);
@@ -79,57 +78,76 @@ begin
 
 	-- FSM registered part
 	tx_fsm_reg_p : process(clk)
+		variable parity_bit_v : std_logic := '0';
 	begin
 		if rising_edge(clk) then 
 			case tx_fsm_r is 
 				
 				when START => 
-					tx_fsm_r <= DATA;
+					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
+						tx_fsm_r <= DATA;
+					end if;
 
 				when DATA =>
-					if 
-					in_dat_r <= '0' & in_dat_r(8 downto 1);
-					if dat_counter_r = unsigned(n_data_bits_r)-1 then 
-						if n_parity_bits_r = '1' then 
-							tx_fsm_r <= PARITY;
-						else 
-							tx_fsm_r <= STOP1;
+					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
+						in_dat_r     <= '0' & in_dat_r(8 downto 1);
+						if dat_counter_r = unsigned(n_data_bits_r)-1 then 
+							if n_parity_bits_r = '1' then 
+								tx_fsm_r <= PARITY;
+							else 
+								tx_fsm_r <= STOP1;
+							end if;
 						end if;
+					end if;
 
 				when PARITY => 
-					if n_stop_bits = "01" then 
-						tx_fsm_r <= STOP2;
-					else
-						tx_fsm_r < STOP1;
+					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
+						if n_stop_bits_r = "01" then 
+							tx_fsm_r <= STOP2;
+						else
+							tx_fsm_r <= STOP1;
+						end if;
 					end if;
-				
+
 				when STOP1 =>
-					tx_fsm_r <= STOP2;
+					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
+						tx_fsm_r <= STOP2;
+					end if;
 
 				when STOP2 =>
-					if in_vld_i = '1' and in_rdy_s = '1' and uart_en_r = '1' then
-						tx_fsm_r               <= START;
-						in_dat_r               <= in_dat_i;
-						internal_clk_divider_r <= internal_clk_divider_i;
-						tx_en_r                <= tx_en;
-						n_parity_bits_r        <= n_parity_bits;
-						n_stop_bits_r          <= n_stop_bits;
-						n_data_bits_r          <= n_data_bits;
-						parity_bit_r           <= xor in_dat_i;
-					else
-						tx_fsm_r <= IDLE;
+					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
+						if in_vld_i = '1' and in_rdy_s = '1' and tx_en = '1' then
+							tx_fsm_r               <= START;
+							in_dat_r               <= in_dat_i;
+							internal_clk_divider_r <= internal_clk_divider_i;
+							n_parity_bits_r        <= n_parity_bits;
+							n_stop_bits_r          <= n_stop_bits;
+							n_data_bits_r          <= n_data_bits;
+							for i in 0 to n_data_bits_r-1 loop
+								parity_bit_v := parity_bit_v xor in_dat_i(i);
+							end loop;
+							parity_bit_r <= parity_bit_v;
+
+						else
+							tx_fsm_r <= IDLE;
+						end if;
 					end if;
 
 				when others => --IDLE
-					if in_vld_i = '1' and in_rdy_s = '1' and uart_en_r = '1' then 
+					if in_vld_i = '1' and in_rdy_s = '1' and tx_en = '1' then 
 						tx_fsm_r               <= START;
 						in_dat_r               <= in_dat_i;
 						internal_clk_divider_r <= internal_clk_divider_i;
-						tx_en_r                <= tx_en;
 						n_parity_bits_r        <= n_parity_bits;
 						n_stop_bits_r          <= n_stop_bits;
 						n_data_bits_r          <= n_data_bits;
-						parity_bit_r           <= xor in_dat_i;
+						parity_bit_r           <= '0';
+						
+						for i in 0 to n_data_bits_r-1 loop
+							parity_bit_v := parity_bit_v xor in_dat_i(i);
+						end loop;
+						parity_bit_r <= parity_bit_v;
+
 					end if;
 			end case;
 
@@ -197,3 +215,7 @@ begin
 		end if;
 	end process;
 
+	-- output assignment
+	in_rdy_o <= in_rdy_s;
+
+end rtl; 

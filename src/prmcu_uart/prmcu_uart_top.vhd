@@ -31,7 +31,7 @@ entity prmcu_uart_top is
 		--input axi interface
 		in_dat_i               : in  std_logic_vector(8 downto 0);
 		in_vld_i               : in  std_logic;
-		in_rdy_o               : in  std_logic;
+		in_rdy_o               : out std_logic;
 
 		-- output axi interface
 		out_dat_o              : out std_logic_vector(8 downto 0);

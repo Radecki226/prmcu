@@ -84,7 +84,7 @@ module tb;
 		n_parity_bits <= 0;
 		n_stop_bits <= 1;
 		n_data_bits <= 8;
-		internal_clk_divider <= 43; /*115200*/ /*div - 2*43*/
+		internal_clk_divider <= 87; /*115200*/ /*div - 87:*/
 		
 		
 		#1000000 
