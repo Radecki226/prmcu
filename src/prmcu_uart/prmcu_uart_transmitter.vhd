@@ -36,7 +36,7 @@ architecture rtl of prmcu_uart_transmitter is
 	signal in_mask_s : std_logic_vector(8 downto 0);
 	signal in_dat_s  : std_logic_vector(8 downto 0);
 	signal in_dat_r  : std_logic_vector(8 downto 0); -- shift register
-	signal in_rdy_s  : std_logic;
+	signal in_rdy_r  : std_logic;
 
 	
 	type tx_fsm_t is (IDLE, START, DATA, PARITY, STOP1, STOP2);
@@ -115,6 +115,8 @@ begin
 						if dat_counter_r = unsigned(n_data_bits_r)-1 then 
 							if n_parity_bits_r = '1' then 
 								tx_fsm_r <= PARITY;
+							elsif n_stop_bits_r = "01" then  
+								tx_fsm_r <= STOP2;
 							else 
 								tx_fsm_r <= STOP1;
 							end if;
@@ -125,6 +127,7 @@ begin
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
 						if n_stop_bits_r = "01" then 
 							tx_fsm_r <= STOP2;
+							in_rdy_r <= '1';
 						else
 							tx_fsm_r <= STOP1;
 						end if;
@@ -133,11 +136,13 @@ begin
 				when STOP1 =>
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
 						tx_fsm_r <= STOP2;
+						in_rdy_r <= '1';
 					end if;
 
 				when STOP2 =>
+				--napisac tak zeby ready nie bralo dancyh ajk pojeb
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
-						if in_vld_i = '1' and in_rdy_s = '1' and tx_en = '1' then
+						if in_vld_i = '1' and in_rdy_r = '1' and tx_en = '1' then
 							tx_fsm_r               <= START;
 							in_dat_r               <= in_dat_s;
 							internal_clk_divider_r <= internal_clk_divider_i;
@@ -157,7 +162,7 @@ begin
 					end if;
 
 				when others => --IDLE
-					if in_vld_i = '1' and in_rdy_s = '1' and tx_en = '1' then 
+					if in_vld_i = '1' and in_rdy_r = '1' and tx_en = '1' then 
 						tx_fsm_r               <= START;
 						in_dat_r               <= in_dat_s;
 						internal_clk_divider_r <= internal_clk_divider_i;
@@ -182,7 +187,7 @@ begin
 	end process;
 
 	-- FSM, combinational part
-	tx_fsm_comb_p : process(tx_fsm_r)
+	tx_fsm_comb_p : process(tx_fsm_r, in_dat_r, parity_bit_r)
 	begin
 		case tx_fsm_r is 
 			when START => 
@@ -199,11 +204,6 @@ begin
 
 		end case;
 
-		if tx_fsm_r = STOP2 or tx_fsm_r = IDLE then 
-			in_rdy_s <= '1';
-		else
-			in_rdy_s <= '0';
-		end if;
 
 		if tx_fsm_r = IDLE then 
 			internal_clk_counter_en <= '0';
@@ -223,22 +223,22 @@ begin
 	dat_counter_p : process(clk)
 	begin
 		if rising_edge(clk) then 
-			if dat_counter_en = '1' then
-				if dat_counter_r = unsigned(n_data_bits_r)-1 then
-					dat_counter_r <= (others => '0');
-				else
-					dat_counter_r <= dat_counter_r + 1;
+
+			if (rst = '1') then 
+				dat_counter_r <= (others => '0');
+			else
+				if dat_counter_en = '1' then
+					if dat_counter_r = unsigned(n_data_bits_r)-1 then
+						dat_counter_r <= (others => '0');
+					else
+						dat_counter_r <= dat_counter_r + 1;
+					end if;
 				end if;
 			end if;
-
-			if rst = '1' then 
-				dat_counter_r <= (others => '0');
-			end if;
-
 		end if;
 	end process;
 
 	-- output assignment
-	in_rdy_o <= in_rdy_s;
+	in_rdy_o <= in_rdy_r;
 
 end rtl; 

@@ -9,9 +9,9 @@ src: $(SOURCEFILES)
 	cd $(SP)/build make all 
 
 test: $(VERIFFILES)
-	iverilog -g2012 -o build  $(SP)/prmcu_uart_top.vhd $(VP)/uart_tb.sv
+	iverilog -g2012 -o build $(VP)/uart_tb.sv -c $(SP)/prmcu_uart.f
 	vvp build
-	gtkwave dump.vcd
+	gtkwave uart_dump.vcd &
 
 all: src test 
 

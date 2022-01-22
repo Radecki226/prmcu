@@ -3,11 +3,16 @@
 /*Assumption is that input clk has f=10MHz*/
 module tb;
 	int n_writes = 20;
-	bit [8:0] in_dat_buffer [100];
-	bit [2:0] in_overhead_buffer [100];
+	
+	bit [8:0] in_dat_buffer [100:0];
+	bit [2:0] in_overhead_buffer [100:0];
 
-	bit [8:0] tx_dat_buffer [100];
-	bit [2:0] tx_overhead_buffer [100];
+	bit [8:0] tx_dat_buffer [100:0];
+	bit [2:0] tx_overhead_buffer [100:0];
+	bit [8:0] tx_dat_capture;
+	bit       tx_parity_capture;
+	bit [1:0] tx_stop_capture;
+
 	int tx_written = 0;
 	int error_cnt = 0;
 	int sc_i = 0;
@@ -47,10 +52,10 @@ module tb;
 		.uart_en(uart_en),
 		.tx_en(tx_en),
 		.rx_en(rx_en),
-		.n_parity_bits(n_parity_bits),
-		.n_stop_bits(n_stop_bits),
-		.n_data_bits(n_data_bits),
-		.internal_clk_divider(internal_clk_divider),
+		.n_parity_bits_i(n_parity_bits),
+		.n_stop_bits_i(n_stop_bits),
+		.n_data_bits_i(n_data_bits),
+		.internal_clk_divider_i(internal_clk_divider),
 
 		.in_dat_i(in_dat),
 		.in_vld_i(in_vld),
@@ -69,16 +74,16 @@ module tb;
 	always #50 clk =~ clk;
 
 	/*113.6 kbaud*/
-	always #4400 external_clk =~ clk;
+	always #4400 external_clk =~ external_clk;
 	
 	/*Clock stimulous*/
 	initial begin
-		clk <= 0;
 		external_clk <= 0;
+		clk <= 0;
 		rst <= 1;
+		uart_en <= 1;
 		#100 
 		rst <= 0;
-		uart_en <= 1;
 		tx_en <= 1;
 		rx_en <= 0;
 		n_parity_bits <= 0;
@@ -87,7 +92,7 @@ module tb;
 		internal_clk_divider <= 87; /*115200*/ /*div - 87:*/
 		
 		
-		#1000000 
+		#10000000 
 		if (error_cnt > 0) begin
 			$display("Sumlation FAILED!");
 		end else begin
@@ -99,8 +104,8 @@ module tb;
 
 	/*dump*/
 	initial begin
-		$dumpvars;
 		$dumpfile("uart_dump.vcd");
+		$dumpvars;
 	end
 
 	/*write (in_dat) generator and driver*/
@@ -120,22 +125,16 @@ module tb;
 	/*monitor in_dat_part*/
 	initial begin
 		for (int i = 0; i < n_writes; i++) begin
-			@(posedge clk & in_vld == 1 & in_rdy == 1)
+			@(posedge clk & in_vld == 1 & in_rdy == 1);
 			in_dat_buffer[i] = in_dat;
-			/*parity*/
-			if (n_parity_bits == 1) begin
-				in_overhead_buffer[i][2] = ^in_dat;
-			end else begin
-				in_overhead_buffer[i][2] = 0;
-			end
-			
-			/*stop bits*/
+	
+			in_overhead_buffer[i] = 3'b010;
+			if (n_parity_bits == 1'b1) begin
+				in_overhead_buffer[i][0] = ^in_dat;
+			end	
 			if (n_stop_bits == 2) begin 
-				in_overhead_buffer[i][1:0] = 2'b11;
-			end else 
-				in_overhead_buffer[i][1:0] = 2'b10;
+				in_overhead_buffer[i][2:1] = 2'b11; 
 			end
-
 		end
 	end
 
@@ -144,14 +143,23 @@ module tb;
 		@(tx == 1);
 		for (int i = 0; i < n_writes; i++) begin 
 			@(posedge external_clk & tx == 0);
-			for (int i = 0; i < n_data_bits; i++) begin
+			tx_dat_capture =  0;
+			tx_parity_capture = 0;
+			tx_stop_capture = 0;
+			for (int j = 0; j < n_data_bits; j++) begin
 				@(posedge external_clk);
-				tx_dat_buffer[i] = tx;
+				tx_dat_capture[j] = tx;
 			end
-			for (int i = 0; i < n_parity_bits+n_stop_bits; i++) begin
+			for (int j = 0; j < n_parity_bits; j++) begin
 				@(posedge external_clk);
-				tx_overhead_buffer[i] = tx;
+				tx_parity_capture = tx;
 			end
+			for (int j = 0; j < n_stop_bits; j++) begin 
+				@(posedge external_clk);
+				tx_stop_capture[j] = tx;
+			end
+			tx_dat_buffer[i] = tx_dat_capture;
+			tx_overhead_buffer[i] = {tx_stop_capture,tx_parity_capture};
 			tx_written = 1;
 		end
 	end
@@ -178,7 +186,7 @@ module tb;
 	end
 	
 	initial begin
-		#100000	
+		#10000000	
 		if(sc_i < n_writes-1) begin
     		$display("T=%0t [Scoreboard] ERROR! Not all data has been captured. Captured frames: %0d", $time, sc_i);
 			error_cnt = error_cnt + 1;
@@ -187,5 +195,3 @@ module tb;
 	
 
 endmodule
-
-
