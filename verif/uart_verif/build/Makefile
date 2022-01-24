@@ -11,7 +11,9 @@ src: $(SOURCEFILES)
 test: $(VERIFFILES)
 	iverilog -g2012 -o build $(VP)/uart_tb.sv -c $(SP)/prmcu_uart.f
 	vvp build
+ifeq ($(GUI),1)
 	gtkwave uart_dump.vcd &
+endif
 
 all: src test 
 

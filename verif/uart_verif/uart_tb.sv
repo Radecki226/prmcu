@@ -41,6 +41,8 @@ module tb;
 
 	wire      tx;
 	reg       rx;
+	int       state;
+	int       drv_dat;
 
 
 	/*DUT declaration*/
@@ -73,8 +75,8 @@ module tb;
 	/*10MHz*/
 	always #50 clk =~ clk;
 
-	/*113.6 kbaud*/
-	always #4400 external_clk =~ external_clk;
+	/*115 kbaud*/
+	always #4350 external_clk =~ external_clk;
 	
 	/*Clock stimulous*/
 	initial begin
@@ -86,9 +88,9 @@ module tb;
 		rst <= 0;
 		tx_en <= 1;
 		rx_en <= 0;
-		n_parity_bits <= 0;
-		n_stop_bits <= 1;
-		n_data_bits <= 8;
+		n_parity_bits <= 1;
+		n_stop_bits <= 2;
+		n_data_bits <= 9;
 		internal_clk_divider <= 87; /*115200*/ /*div - 87:*/
 		
 		
@@ -111,29 +113,50 @@ module tb;
 	/*write (in_dat) generator and driver*/
 	initial begin
 		in_vld <= 0;
-		#350
+		drv_dat = 1;
+		#340
 		in_vld <= 1;
+		in_dat[8] <= 0;
+		in_dat[7:0] <= $urandom();
 		for (int i = 0; i < n_writes; i++) begin
-			in_dat[8] = 0;
-			in_dat[7:0] = $urandom();
+			$display("T = %0t [generator] frame idx: 0%0d",$time ,i);
+			drv_dat = 1;
+			in_vld = 1;
+			@(drv_dat == 0);			
+		end
+		in_vld <= 0;
+	end
 
-			@(posedge clk & in_rdy == 1);
+	/*driver*/
+	always @(posedge clk) begin
+		if (drv_dat == 1 && in_rdy == 1 && in_vld == 1) begin
+			in_dat[8] <= 0;
+			in_dat[7:0] <= $urandom();
+			drv_dat <= 0;
 		end
 	end
 
 
 	/*monitor in_dat_part*/
 	initial begin
+		reg [2:0] in_overhead_capture; 
 		for (int i = 0; i < n_writes; i++) begin
-			@(posedge clk & in_vld == 1 & in_rdy == 1);
-			in_dat_buffer[i] = in_dat;
+			@(posedge clk);
+			
+			if (in_rdy == 1 && in_vld == 1) begin
+				in_dat_buffer[i] = in_dat;
 	
-			in_overhead_buffer[i] = 3'b010;
-			if (n_parity_bits == 1'b1) begin
-				in_overhead_buffer[i][0] = ^in_dat;
-			end	
-			if (n_stop_bits == 2) begin 
-				in_overhead_buffer[i][2:1] = 2'b11; 
+				in_overhead_capture = 3'b010;
+				if (n_parity_bits == 1'b1) begin
+					in_overhead_capture[0] = ^in_dat;
+				end	
+				if (n_stop_bits == 2) begin 
+					in_overhead_capture[2:1] = 2'b11; 
+				end
+				in_overhead_buffer[i] = in_overhead_capture;
+
+			end else begin
+				i = i-1;
 			end
 		end
 	end
@@ -142,21 +165,26 @@ module tb;
 	initial begin
 		@(tx == 1);
 		for (int i = 0; i < n_writes; i++) begin 
-			@(posedge external_clk & tx == 0);
+			@(tx == 0);
+			@(posedge external_clk);
 			tx_dat_capture =  0;
 			tx_parity_capture = 0;
 			tx_stop_capture = 0;
+			state = 1;
 			for (int j = 0; j < n_data_bits; j++) begin
 				@(posedge external_clk);
+				state = 2;
 				tx_dat_capture[j] = tx;
 			end
 			for (int j = 0; j < n_parity_bits; j++) begin
 				@(posedge external_clk);
 				tx_parity_capture = tx;
+				state = 3;
 			end
 			for (int j = 0; j < n_stop_bits; j++) begin 
 				@(posedge external_clk);
 				tx_stop_capture[j] = tx;
+				state = 4;
 			end
 			tx_dat_buffer[i] = tx_dat_capture;
 			tx_overhead_buffer[i] = {tx_stop_capture,tx_parity_capture};
@@ -172,7 +200,8 @@ module tb;
 			tx_written = 0;
 			if (tx_dat_buffer[sc_i] == in_dat_buffer[sc_i]) begin
         		if (tx_overhead_buffer[sc_i] == in_overhead_buffer[sc_i]) begin
-            		$display("T=%0t [Scoreboard] PASS! addr = 0x%0h", $time, sc_i);
+            		$display("T=%0t [Scoreboard] PASS! addr = 0x%0h expected = 0x%0h received = 0x%0h", 
+					         $time, sc_i, in_dat_buffer[sc_i], tx_dat_buffer[sc_i]);
 				end else begin
 					$display("T=%0t [Scoreboard] ERROR! overhead mismatch addr = 0x%0h expected = %0b received = %0b",
 				         	$time, sc_i, in_overhead_buffer[sc_i], tx_overhead_buffer[sc_i]);

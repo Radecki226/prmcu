@@ -36,7 +36,7 @@ architecture rtl of prmcu_uart_transmitter is
 	signal in_mask_s : std_logic_vector(8 downto 0);
 	signal in_dat_s  : std_logic_vector(8 downto 0);
 	signal in_dat_r  : std_logic_vector(8 downto 0); -- shift register
-	signal in_rdy_r  : std_logic;
+	signal in_rdy_s  : std_logic;
 
 	
 	type tx_fsm_t is (IDLE, START, DATA, PARITY, STOP1, STOP2);
@@ -99,7 +99,7 @@ begin
 
 	-- FSM registered part
 	tx_fsm_reg_p : process(clk)
-		variable parity_bit_v : std_logic := '0';
+		variable parity_bit_v : std_logic;
 	begin
 		if rising_edge(clk) then 
 			case tx_fsm_r is 
@@ -127,7 +127,6 @@ begin
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
 						if n_stop_bits_r = "01" then 
 							tx_fsm_r <= STOP2;
-							in_rdy_r <= '1';
 						else
 							tx_fsm_r <= STOP1;
 						end if;
@@ -136,41 +135,24 @@ begin
 				when STOP1 =>
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
 						tx_fsm_r <= STOP2;
-						in_rdy_r <= '1';
 					end if;
 
 				when STOP2 =>
-				--napisac tak zeby ready nie bralo dancyh ajk pojeb
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
-						if in_vld_i = '1' and in_rdy_r = '1' and tx_en = '1' then
-							tx_fsm_r               <= START;
-							in_dat_r               <= in_dat_s;
-							internal_clk_divider_r <= internal_clk_divider_i;
-							n_parity_bits_r        <= n_parity_bits_i;
-							n_stop_bits_r          <= n_stop_bits_i;
-							n_data_bits_r          <= n_data_bits_i;
-							parity_bit_r           <= '0';
-
-							for i in 0 to 8 loop
-								parity_bit_v := parity_bit_v xor in_dat_s(i);
-							end loop;
-							parity_bit_r <= parity_bit_v;
-
-						else
-							tx_fsm_r <= IDLE;
-						end if;
+						tx_fsm_r <= IDLE;
 					end if;
 
 				when others => --IDLE
-					if in_vld_i = '1' and in_rdy_r = '1' and tx_en = '1' then 
+					if in_vld_i = '1' and in_rdy_s = '1' and tx_en = '1' then 
 						tx_fsm_r               <= START;
 						in_dat_r               <= in_dat_s;
 						internal_clk_divider_r <= internal_clk_divider_i;
 						n_parity_bits_r        <= n_parity_bits_i;
 						n_stop_bits_r          <= n_stop_bits_i;
 						n_data_bits_r          <= n_data_bits_i;
-						parity_bit_r           <= '0';
+						--parity_bit_r           <= '0';
 						
+						parity_bit_v := '0';
 						for i in 0 to 8 loop
 							parity_bit_v := parity_bit_v xor in_dat_s(i);
 						end loop;
@@ -204,11 +186,12 @@ begin
 
 		end case;
 
-
 		if tx_fsm_r = IDLE then 
 			internal_clk_counter_en <= '0';
+			in_rdy_s <= '1';
 		else 
 			internal_clk_counter_en <= '1';
+			in_rdy_s <= '0';
 		end if;
 
 		if tx_fsm_r = DATA then 
@@ -239,6 +222,6 @@ begin
 	end process;
 
 	-- output assignment
-	in_rdy_o <= in_rdy_r;
+	in_rdy_o <= in_rdy_s;
 
 end rtl; 
