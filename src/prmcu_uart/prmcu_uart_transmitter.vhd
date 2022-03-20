@@ -54,6 +54,7 @@ architecture rtl of prmcu_uart_transmitter is
 	signal dat_counter_en          : std_logic;
 
 	signal internal_clk_counter_r  : unsigned(8 downto 0);
+	signal internal_clk_debug_r    : std_logic;
 	signal internal_clk_counter_r1 : unsigned(8 downto 0); -- delayed copy
 	signal internal_clk_counter_en : std_logic;
 
@@ -67,10 +68,13 @@ begin
 			if internal_clk_counter_en = '1' then 
 				if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
 					internal_clk_counter_r <= (others => '0');
+					internal_clk_debug_r   <= '1';
 				else
 					internal_clk_counter_r <= internal_clk_counter_r + 1;
+					internal_clk_debug_r <= '0';
 				end if;
 			end if;
+
 
 			if rst = '1' then 
 				internal_clk_counter_r <= (others => '0');
@@ -121,6 +125,7 @@ begin
 								tx_fsm_r <= STOP1;
 							end if;
 						end if;
+						dat_counter_r <= dat_counter_r + 1; 
 					end if;
 
 				when PARITY => 
@@ -150,6 +155,7 @@ begin
 						n_parity_bits_r        <= n_parity_bits_i;
 						n_stop_bits_r          <= n_stop_bits_i;
 						n_data_bits_r          <= n_data_bits_i;
+						dat_counter_r          <= (others => '0');
 						--parity_bit_r           <= '0';
 						
 						parity_bit_v := '0';
@@ -203,7 +209,7 @@ begin
 	end process;
 
 	-- counter for data state
-	dat_counter_p : process(clk)
+	/*dat_counter_p : process(clk)
 	begin
 		if rising_edge(clk) then 
 
@@ -219,7 +225,7 @@ begin
 				end if;
 			end if;
 		end if;
-	end process;
+	end process;*/
 
 	-- output assignment
 	in_rdy_o <= in_rdy_s;

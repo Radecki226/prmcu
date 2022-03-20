@@ -1,17 +1,29 @@
 `timescale 1ns/1ps
+`ifndef N_DATA
+  `define N_DATA 100
+`endif
+`ifndef N_BITS
+  `define N_BITS 6
+`endif
+`ifndef N_STOP_BITS
+  `define N_STOP_BITS 6
+`endif
+`ifndef N_PARITY_BITS
+  `define N_PARITY_BITS 6
+`endif
+`ifndef RECV_RATE
+  `define RECV_RATE 115000
+`endif
+`define RECV_DELAY 1000000000/(2*`RECV_RATE)
  
 /*Assumption is that input clk has f=10MHz*/
 module tb;
-	int n_writes = 20;
 	
-	bit [8:0] in_dat_buffer [100:0];
-	bit [2:0] in_overhead_buffer [100:0];
+	bit [8:0] out_dat_buffer [`N_DATA:0];
+	bit [2:0] out_overhead_buffer [`N_DATA:0];
 
-	bit [8:0] tx_dat_buffer [100:0];
-	bit [2:0] tx_overhead_buffer [100:0];
-	bit [8:0] tx_dat_capture;
-	bit       tx_parity_capture;
-	bit [1:0] tx_stop_capture;
+	bit [8:0] rx_dat_buffer [`N_DATA:0];
+	bit [2:0] rx_overhead_buffer [`N_DATA:0];
 
 	int tx_written = 0;
 	int error_cnt = 0;
@@ -75,8 +87,9 @@ module tb;
 	/*10MHz*/
 	always #50 clk =~ clk;
 
+	
 	/*115 kbaud*/
-	always #4350 external_clk =~ external_clk;
+  always #(`RECV_DELAY) external_clk =~ external_clk;
 	
 	/*Clock stimulous*/
 	initial begin
@@ -86,11 +99,11 @@ module tb;
 		uart_en <= 1;
 		#100 
 		rst <= 0;
-		tx_en <= 1;
-		rx_en <= 0;
-		n_parity_bits <= 1;
-		n_stop_bits <= 2;
-		n_data_bits <= 9;
+		tx_en <= 0;
+		rx_en <= 1;
+		n_parity_bits <= `N_PARITY_BITS;
+		n_stop_bits <= `N_STOP_BITS;
+		n_data_bits <= `N_BITS;
 		internal_clk_divider <= 87; /*115200*/ /*div - 87:*/
 		
 		
@@ -100,6 +113,8 @@ module tb;
 		end else begin
 			$display("Simulation PASSED!");
 		end
+		$display("test %d\n", `TEST);
+		$display("delay %d\n", `RECV_DELAY);
 		$finish;
 
 	end
@@ -116,8 +131,7 @@ module tb;
 		drv_dat = 1;
 		#340
 		in_vld <= 1;
-		in_dat[8] <= 0;
-		in_dat[7:0] <= $urandom();
+		rx_dat <= $urandom();
 		for (int i = 0; i < n_writes; i++) begin
 			$display("T = %0t [generator] frame idx: 0%0d",$time ,i);
 			drv_dat = 1;
@@ -144,11 +158,11 @@ module tb;
 			@(posedge clk);
 			
 			if (in_rdy == 1 && in_vld == 1) begin
-				in_dat_buffer[i] = in_dat;
+				in_dat_buffer[i] = in_dat[`N_BITS-1:0];
 	
 				in_overhead_capture = 3'b010;
 				if (n_parity_bits == 1'b1) begin
-					in_overhead_capture[0] = ^in_dat;
+					in_overhead_capture[0] = ^in_dat[`N_BITS-1:0];
 				end	
 				if (n_stop_bits == 2) begin 
 					in_overhead_capture[2:1] = 2'b11; 
