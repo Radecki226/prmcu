@@ -102,6 +102,7 @@ module tb;
 		tx_en <= 0;
 		rx_en <= 1;
 		rx <= 1;
+		out_rdy <= 1;
 		n_parity_bits <= `N_PARITY_BITS;
 		n_stop_bits <= `N_STOP_BITS;
 		n_data_bits <= `N_BITS;

@@ -47,11 +47,11 @@ architecture rtl of prmcu_uart_transmitter is
 	signal n_parity_bits_r        : std_logic;
 	signal n_stop_bits_r          : std_logic_vector(1 downto 0);
 	signal n_data_bits_r          : std_logic_vector(3 downto 0);
-	signal parity_bit_r : std_logic;
+	signal parity_bit_r           : std_logic;
 
 	-- counters
 	signal dat_counter_r           : unsigned(3 downto 0);
-	signal dat_counter_en          : std_logic;
+	--signal dat_counter_en          : std_logic;
 
 	signal internal_clk_counter_r  : unsigned(8 downto 0);
 	signal internal_clk_debug_r    : std_logic;
@@ -115,7 +115,7 @@ begin
 
 				when DATA =>
 					if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
-						in_dat_r     <= '0' & in_dat_r(8 downto 1);
+						in_dat_r <= '0' & in_dat_r(8 downto 1);
 						if dat_counter_r = unsigned(n_data_bits_r)-1 then 
 							if n_parity_bits_r = '1' then 
 								tx_fsm_r <= PARITY;
@@ -156,7 +156,6 @@ begin
 						n_stop_bits_r          <= n_stop_bits_i;
 						n_data_bits_r          <= n_data_bits_i;
 						dat_counter_r          <= (others => '0');
-						--parity_bit_r           <= '0';
 						
 						parity_bit_v := '0';
 						for i in 0 to 8 loop
@@ -200,11 +199,11 @@ begin
 			in_rdy_s <= '0';
 		end if;
 
-		if tx_fsm_r = DATA then 
+		/*if tx_fsm_r = DATA then 
 			dat_counter_en <= '1';
 		else
 			dat_counter_en <= '0';
-		end if;
+		end if;*/
 
 	end process;
 

@@ -72,7 +72,7 @@ architecture rtl of prmcu_uart_top is
 			clk                    : in  std_logic;
 			internal_clk_divider_i : in  std_logic_vector(7 downto 0);
 			rst                    : in  std_logic;
-			rx_en                  : in  std_logic;
+			rx_en_i                : in  std_logic;
 			n_parity_bits_i        : in  std_logic;
 			n_stop_bits_i          : in  std_logic_vector(1 downto 0);
 			n_data_bits_i          : in  std_logic_vector(3 downto 0);
@@ -115,9 +115,10 @@ begin
 		clk                    => clk and uart_en,
 		internal_clk_divider_i => internal_clk_divider_i,
 		rst                    => rst,
-		rx_en                  => rx_en,
+		rx_en_i                => rx_en,
 		n_parity_bits_i        => n_parity_bits_i,
 		n_stop_bits_i          => n_stop_bits_i,
+		n_data_bits_i          => n_data_bits_i,
 
 		out_dat_o              => out_dat_o,
 		out_vld_o              => out_vld_o,
