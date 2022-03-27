@@ -93,11 +93,11 @@ module tb;
 	
 	/*Clock stimulous*/
 	initial begin
-		external_clk <= 0;
+		external_clk <= 1;
 		clk <= 0;
 		rst <= 1;
 		uart_en <= 1;
-		#100 
+	  #100	
 		rst <= 0;
 		tx_en <= 0;
 		rx_en <= 1;
@@ -136,37 +136,41 @@ module tb;
 
 	/*driver*/
 	initial begin
+		@(rst == 1);
 		#100
 		for (int i = 0; i < `N_DATA; i++) begin
       #`ITERATION_DELAY
-			rx <= 0;
+      $display("T=%0t [Driver] Data with addr = 0x%0h and value = 0x%0h has been driven", 
+			         $time, i, rx_dat_buffer[i]);
+			rx = 0;
 			@(posedge external_clk);
 			for (int j = 0; j < `N_BITS; j++) begin
-				rx <= rx_dat_buffer[i][j];
+				rx = rx_dat_buffer[i][j];
 				@(posedge external_clk);
 			end
 			if (`N_PARITY_BITS == 1) begin
-			  rx <= ^rx_dat_buffer[i];
+			  rx = ^rx_dat_buffer[i];
 				@(posedge external_clk);
 			end
 			for (int j = 0; j < `N_STOP_BITS; j++) begin
-				rx <= 1;
+				rx = 1;
 				@(posedge external_clk);
 			end
-      $display("T=%0t [Driver] Data with addr = 0x%0h and value = 0x%0h has been driven", 
-			         $time, i, rx_dat_buffer[i]);
 
 		end
 	end
 
   /*Monitor out_dat*/
 	initial begin
+		@(rst == 1)
+		@(posedge clk);
 		for (int i = 0; i < `N_DATA; i++) begin
 			@(out_vld == 1);
 			@(posedge clk);
 			out_dat_buffer[i] = out_dat;
 			out_dat_written = 1;
 			@(out_dat_written == 0);
+			@(posedge clk);
 		end
 	end
 	/*scoreboard*/
@@ -175,14 +179,14 @@ module tb;
 		for (int i = 0; i < `N_DATA; i++) begin
 			@(out_dat_written == 1);
 			if (out_dat_buffer[i][`N_BITS-1:0] == rx_dat_buffer[i][`N_BITS-1:0]) begin
-        $display("T=%0t [Scoreboard] PASS! addr = 0x%0h expected = 0x%0h received = 0x%0h", 
-			           $time, i, out_dat_buffer[i], rx_dat_buffer[i]);
+        $display("T=%0t [Scoreboard] PASS! addr = 0x%0h received = 0x%0h expected = 0x%0h", 
+			           $time, i, out_dat_buffer[i][`N_BITS-1:0], rx_dat_buffer[i][`N_BITS-1:0]);
 			end else begin
-				$display("T=%0t [Scoreboard] ERROR! data mismatch addr = 0x%0h expected = 0x%0h received = 0x%0h",
-				         $time, i, out_dat_buffer[i], rx_dat_buffer[i]);
+				$display("T=%0t [Scoreboard] ERROR! data mismatch addr = 0x%0h received = 0x%0h expected = 0x%0h",
+				         $time, i, out_dat_buffer[i][`N_BITES-1:0], rx_dat_buffer[i][`N_BITS-1:0]);
 				error_cnt = error_cnt + 1;
 			end
-			out_dat_written = 1;
+			out_dat_written = 0;
 		end
 		finish_flag = 1;
 	end

@@ -47,6 +47,7 @@ architecture rtl of prmcu_uart_receiver is
 	signal n_stop_bits_r               : std_logic_vector(1 downto 0);
 	signal n_data_bits_r               : std_logic_vector(3 downto 0);
 	signal parity_bit_r                : std_logic;
+	signal output_shift_s              : unsigned(3 downto 0);
 
 	-- counters
 	signal dat_counter_r          : unsigned(3 downto 0);
@@ -198,7 +199,8 @@ begin
 	end process;
 
   -- output assignmend
-	out_dat_o <= out_dat_r;
+	output_shift_s <= 9 - unsigned(n_data_bits_r);
+	out_dat_o <= shift_right(unsigned(out_dat_r),to_integer(output_shift_s));
   out_vld_o <= out_vld_s;
 
 
