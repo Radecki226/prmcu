@@ -149,7 +149,7 @@ module tb;
 				@(posedge external_clk);
 			end
 			if (`N_PARITY_BITS == 1) begin
-			  rx = ^rx_dat_buffer[i];
+			  rx = ^rx_dat_buffer[i][`N_BITS-1:0];
 				@(posedge external_clk);
 			end
 			for (int j = 0; j < `N_STOP_BITS; j++) begin
@@ -183,7 +183,7 @@ module tb;
 			           $time, i, out_dat_buffer[i][`N_BITS-1:0], rx_dat_buffer[i][`N_BITS-1:0]);
 			end else begin
 				$display("T=%0t [Scoreboard] ERROR! data mismatch addr = 0x%0h received = 0x%0h expected = 0x%0h",
-				         $time, i, out_dat_buffer[i][`N_BITES-1:0], rx_dat_buffer[i][`N_BITS-1:0]);
+				         $time, i, out_dat_buffer[i][`N_BITS-1:0], rx_dat_buffer[i][`N_BITS-1:0]);
 				error_cnt = error_cnt + 1;
 			end
 			out_dat_written = 0;
