@@ -116,7 +116,7 @@ module tb;
 
 	/*dump*/
 	initial begin
-		$dumpfile("uart_dump.vcd");
+		$dumpfile("uart_transmitter_tb.vcd");
 		$dumpvars;
 	end
 

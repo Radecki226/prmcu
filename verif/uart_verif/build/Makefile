@@ -7,6 +7,6 @@ all: $(VERIFFILES)
 	iverilog -g2012 -o build $(VP)/$(NAME).sv -c $(SP)/prmcu_uart.f $(FLAGS)
 	vvp build
 ifeq ($(GUI),1)
-	gtkwave uart_dump.vcd &
+	gtkwave $(NAME).vcd &
 endif
 

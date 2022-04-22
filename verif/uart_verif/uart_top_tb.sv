@@ -27,7 +27,6 @@ module tb;
   bit [`N_BITS-1:0] led_state [`N_DATA:0];
 
 	bit [`N_BITS-1:0] rx_dat_buffer [`N_DATA-1:0];
-	bit               rx_driver;
 
 	/*tx side*/
 	bit [`N_BITS-1:0] tx_dat;
@@ -39,6 +38,7 @@ module tb;
 	int error_cnt = 0;
 	int error_cnt_tx = 0;
 	int finish_flag = 0;
+	int finish_flag_led = 0;
 	
 	reg external_clk;
 
@@ -54,8 +54,7 @@ module tb;
 
 
 	/*DUT declaration*/
-	prmcu_uart_hw_test_dut
-	#(parameter CLK_DIVIDER=87)
+	prmcu_uart_hw_test dut
 	(
 		.clk(clk),
 		.rst(rst),
@@ -63,9 +62,9 @@ module tb;
 		.tx_o(tx),
 		.rx_i(rx),
 
-		.led_dat_o(led),
+		.led_dat_o(led_dat),
 		.led_vld_o(led_vld)
-	)
+	);
 	
 	/*10MHz*/
 	always #50 clk =~ clk;
@@ -86,7 +85,7 @@ module tb;
 
 	/*dump*/
 	initial begin
-		$dumpfile("uart_hw_test_dump.vcd");
+		$dumpfile("uart_top_tb.vcd");
 		$dumpvars;
 	end
 
@@ -94,6 +93,9 @@ module tb;
 	initial begin
 		for (int i = 0; i < `N_DATA; i++) begin
 			rx_dat_buffer[i] <= $urandom();
+			if (i%10 == 0) begin
+				rx_dat_buffer[i] <= 8'h54;
+			end
 		end
 	end
 
@@ -137,7 +139,7 @@ module tb;
 		@(tx == 1);
 		while (1) begin
 			@(tx == 0);
-			@posedge(external_clk);
+			@(posedge external_clk);
 			for (int i = 0; i < `N_BITS ; i++) begin
 				@(posedge external_clk);
 				tx_dat[i] = tx;
@@ -155,23 +157,22 @@ module tb;
 		for (int i = 0; i < `N_DATA; i++) begin
 			@(led_written == 1);
 			if (i != 0) begin
-				if (led[i] == led[i-1]) begin
-					if rx_dat_buffer[i] != 84 begin
-						$display("T=%0t [Scoreboard] ERROR! Diode changed although it shouldn't have!",$time, i);
+				if (led_state[i] == led_state[i-1]) begin
+					if (rx_dat_buffer[i] != 8'h54) begin
+						$display("T=%0t [Scoreboard] ERROR! Diode changed although it shouldn't have!",$time);
 						error_cnt = error_cnt + 1;
 				  end
-				else begin
-					if rx_dat_buffer[i] == 84 begin
-						$display("T=%0t [Scoreboard] ERROR! Diode didn't change although it should have!",$time, i);
+				end else begin
+					if (rx_dat_buffer[i] == 8'h54) begin
+						$display("T=%0t [Scoreboard] ERROR! Diode didn't change although it should have!",$time);
 						error_cnt = error_cnt + 1;
 					end else begin
-						$display("T=%0t [Scoreboard] PASS! Diode changed OK!",$time, i);
+						$display("T=%0t [Scoreboard] PASS! Diode changed OK!",$time);
 					end
 				end
 			end
       led_written = 0;
 		end
-		finish_flag_led = 1;
 	end
   
 	/*scoreboard tx*/
@@ -179,9 +180,9 @@ module tb;
 	  while(1) begin
 			@(tx_written == 1);
 			tx_written = 0;
-			if (tx_result == 84) begin
+			if (tx_result == 8'h54) begin
 				$display("T=%0t [Scoreboard] PASS! Tx ok", $time);
-			else begin
+			end else begin
 				$display("T=%0t [Scoreboard] ERROR! Tx wrong value = 0x%0h", $time, tx_result);
 				error_cnt_tx += 1;
 			end
@@ -189,9 +190,7 @@ module tb;
 	end
 	
 	initial begin
-		#100000000	
-    $display("T=%0t [Scoreboard] ERROR! Not all data has been captured",$time);
-	  error_cnt = error_cnt + 1;
+		#10000000	
 		finish_flag = 1;
 	end
 

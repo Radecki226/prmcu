@@ -123,7 +123,7 @@ module tb;
 
 	/*dump*/
 	initial begin
-		$dumpfile("uart_dump.vcd");
+		$dumpfile("uart_receiver_tb.vcd");
 		$dumpvars;
 	end
 
