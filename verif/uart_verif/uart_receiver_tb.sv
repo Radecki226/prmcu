@@ -97,11 +97,11 @@ module tb;
 		clk <= 0;
 		rst <= 1;
 		uart_en <= 1;
+		rx <= 1;
 	  #100	
 		rst <= 0;
 		tx_en <= 0;
 		rx_en <= 1;
-		rx <= 1;
 		out_rdy <= 1;
 		n_parity_bits <= `N_PARITY_BITS;
 		n_stop_bits <= `N_STOP_BITS;
@@ -141,19 +141,20 @@ module tb;
 		for (int i = 0; i < `N_DATA; i++) begin
       #`ITERATION_DELAY
       $display("T=%0t [Driver] Data with addr = 0x%0h and value = 0x%0h has been driven", 
-			         $time, i, rx_dat_buffer[i]);
-			rx = 0;
+			         $time, i, rx_dat_buffer[i][`N_BITS-1:0]);
+			rx <= 0;
 			@(posedge external_clk);
 			for (int j = 0; j < `N_BITS; j++) begin
-				rx = rx_dat_buffer[i][j];
+				$display("%b", rx_dat_buffer[i][j]);
+				rx <= rx_dat_buffer[i][j];
 				@(posedge external_clk);
 			end
 			if (`N_PARITY_BITS == 1) begin
-			  rx = ^rx_dat_buffer[i][`N_BITS-1:0];
+			  rx <= ^rx_dat_buffer[i][`N_BITS-1:0];
 				@(posedge external_clk);
 			end
 			for (int j = 0; j < `N_STOP_BITS; j++) begin
-				rx = 1;
+				rx <= 1;
 				@(posedge external_clk);
 			end
 

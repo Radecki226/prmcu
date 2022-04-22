@@ -37,12 +37,12 @@ architecture rtl of prmcu_uart_receiver is
 	signal out_vld_s  : std_logic;
 
 	
-	type rx_fsm_t is (IDLE, START, DATA, PARITY, STOP1, STOP2, SEND_ERROR, SEND_DATA);
+	type rx_fsm_t is (IDLE, WAIT_HALF_BIT, START, DATA, PARITY, STOP, SEND_ERROR, SEND_DATA);
 	signal rx_fsm_r : rx_fsm_t;
 
 	--config signals
 	signal internal_clk_divider_r      : std_logic_vector(7 downto 0);
-	signal internal_clk_divider_div2_s : std_logic_vector(6 downto 0);
+	signal internal_clk_divider_div2_s : std_logic_vector(7 downto 0);
 	signal n_parity_bits_r             : std_logic;
 	signal n_stop_bits_r               : std_logic_vector(1 downto 0);
 	signal n_data_bits_r               : std_logic_vector(3 downto 0);
@@ -59,6 +59,8 @@ architecture rtl of prmcu_uart_receiver is
 	-- error
 	signal parity_err_flag_r : std_logic;
 	signal err_pulse_s       : std_logic;
+
+	signal rx_r              : std_logic;
 
 begin
 
@@ -82,14 +84,14 @@ begin
 
 		end if;
 	end process;
-	internal_clk_divider_div2_s <= internal_clk_divider_r(7 downto 1);
+	internal_clk_divider_div2_s <= '0' & internal_clk_divider_r(7 downto 1);
 
 	-- FSM registered part
 	rx_fsm_reg_p : process(clk)
 	begin
 		if rising_edge(clk) then
-			case rx_fsm_r is 
-
+			rx_r <= rx_i;
+			case rx_fsm_r is
 
 				when START => 
           if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then 
@@ -106,10 +108,8 @@ begin
 						if dat_counter_r = unsigned(n_data_bits_r)-1 then
 							if n_parity_bits_r = '1' then
 								rx_fsm_r <= PARITY;
-							elsif n_stop_bits_r = "01" then
-								rx_fsm_r <= STOP2;
 							else
-								rx_fsm_r <= STOP1;
+								rx_fsm_r <= STOP;
 							end if;
 						end if;
 					  dat_counter_r <= dat_counter_r + 1;
@@ -124,38 +124,27 @@ begin
 							parity_err_flag_r <= '1';
 						end if;
 							
-						if n_stop_bits_r = "01" then
-							rx_fsm_r <= STOP2;
-						else
-							rx_fsm_r <= STOP1;
-						end if;
+						rx_fsm_r <= STOP;
 
 					end if;
 
-			when STOP1 => 
-			  if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then
-				  rx_fsm_r <= STOP2;
-			  end if;
-
-			when STOP2 =>
-				if internal_clk_counter_r = unsigned(internal_clk_divider_r)-1 then
-					if parity_err_flag_r = '1' then
-						rx_fsm_r <= SEND_ERROR;
-					else
-					  rx_fsm_r <= SEND_DATA;
-					end if;
+			when STOP =>
+				if parity_err_flag_r = '1' then
+					rx_fsm_r <= SEND_ERROR;
+				else
+					rx_fsm_r <= SEND_DATA;
 				end if;
 
 			when SEND_ERROR =>
 				rx_fsm_r <= IDLE;
 
 			when SEND_DATA =>
-				if out_rdy_i = '1' and out_vld_s = '1' then
+				if out_rdy_i = '1' and out_vld_s = '1' then --TODO: problematic
 					rx_fsm_r <= IDLE;
 				end if;
 
 			when others => --IDLE
-			  if rx_i = '0' and rx_en_i = '1' then
+			  if rx_i = '0' and rx_r = '1' and rx_en_i = '1' then
 					rx_fsm_r               <= START;
 					internal_clk_divider_r <= internal_clk_divider_i;
 					n_parity_bits_r        <= n_parity_bits_i;
