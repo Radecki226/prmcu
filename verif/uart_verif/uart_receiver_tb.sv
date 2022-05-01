@@ -122,11 +122,12 @@ module tb;
 	end
 
 	/*dump*/
+	/*
 	initial begin
 		$dumpfile("uart_receiver_tb.vcd");
 		$dumpvars;
 	end
-
+*/
 	/*rx dat generator*/
 	initial begin
 		for (int i = 0; i < `N_DATA; i++) begin

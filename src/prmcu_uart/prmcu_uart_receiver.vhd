@@ -189,8 +189,8 @@ begin
 
   -- output assignmend
 	output_shift_s <= 9 - unsigned(n_data_bits_r);
-	out_dat_o <= shift_right(unsigned(out_dat_r),to_integer(output_shift_s));
-  out_vld_o <= out_vld_s;
+	out_dat_o <= std_logic_vector(shift_right(unsigned(out_dat_r),to_integer(output_shift_s)));
+   out_vld_o <= out_vld_s;
 
 
 end rtl;

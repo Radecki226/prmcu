@@ -13,13 +13,14 @@ entity prmcu_uart_hw_test is
   );
   port(
 	  clk : in std_logic;
-	  rst : in std_logic;
+	  n_rst : in std_logic;
 	  
 	  tx_o : out std_logic;
 	  rx_i : in std_logic;
 
 	  led_dat_o : out std_logic;
 	  led_vld_o : out std_logic
+
   );
 end entity prmcu_uart_hw_test;
 
@@ -56,7 +57,6 @@ architecture rtl of prmcu_uart_hw_test is
 		);
   end component prmcu_uart_top;
   
-	signal in_dat_r : std_logic_vector(8 downto 0);
 	signal in_vld_r : std_logic;
 
 	signal out_dat_s : std_logic_vector(8 downto 0);
@@ -67,8 +67,8 @@ architecture rtl of prmcu_uart_hw_test is
 	signal led_vld_r : std_logic;
 	signal led_dat_r : std_logic;
 
-	constant INTERVAL : unsigned := 10000;
-
+	signal INTERVAL : integer := 1000000;
+	
 
 begin
 
@@ -76,7 +76,7 @@ begin
   port map(
     clk => clk,
     internal_clk_o => open,
-    rst => rst,
+    rst => not(n_rst),
 
 		uart_en => '1',
 		tx_en => '1',
@@ -84,9 +84,9 @@ begin
 		n_parity_bits_i => '0',
 		n_stop_bits_i => "01",
 		n_data_bits_i => "1000",
-		internal_clk_divider_i => to_unsigned(CLK_DIVIDER, 8),
+		internal_clk_divider_i => "01010111", --87
 
-		in_dat_i => in_dat_r,
+		in_dat_i => "001010100", --T
 		in_vld_i => in_vld_r,
 		in_rdy_o => open,
 
@@ -104,13 +104,13 @@ begin
 	  if rising_edge(clk) then
 			led_vld_r <= '0';
 			if out_vld_s = '1' then
-			  if out_dat_s = "001010100" then
+			  if out_dat_s = "001110100" then
 				  led_dat_r <= not led_dat_r;
 					led_vld_r <= '1';
 				end if;
 			end if;
 
-			if rst = '1' then
+			if n_rst = '0' then
 			  led_dat_r <= '0';
 				led_vld_r <= '0';
 			end if;
@@ -121,32 +121,38 @@ begin
 	signal_gen_p : process(clk) begin
 	  if rising_edge(clk) then
 			in_vld_r <= '0';
-			if counter_r = INTERVAL-10 then
-				in_dat_r <= "001010100";
+			if counter_r = INTERVAL-1 then
 				in_vld_r <= '1';
 			end if;
 		  
-			if rst = '1' then
+			if n_rst = '0' then
 				in_vld_r <= '0';
 			end if;
 
 		end if;
 	end process;
+	
+	
 
 	counter_p : process(clk) begin
-		if counter_r = INTERVAL-1 then
-			counter_r <= 0;
-		else
-			counter_r <= counter_r + 1;
-		end if;
+		if rising_edge(clk) then
+			if counter_r = INTERVAL-1 then
+				counter_r <= (others => '0');
+			else
+				counter_r <= counter_r + 1;
+			end if;
 
-		if rst = '1' then
-			counter_r <= 0;
+			if n_rst = '0' then
+				counter_r <= (others => '0');
+			end if;
 		end if;
 	end process;
+	
+	
+		
 
 	led_dat_o <= led_dat_r;
-  led_vld_o <= led_vld_r;
+	led_vld_o <= led_vld_r;
 			  
 
 end rtl;

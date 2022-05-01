@@ -86,13 +86,13 @@ begin
 	mask_in_dat_p : process(n_data_bits_i)
 	begin
 		case n_data_bits_i is 
-			when 5 =>
+			when "0101" =>
 				in_mask_s <= "000011111";
-			when 6 =>
+			when "0110" =>
 				in_mask_s <= "000111111";
-			when 7 =>
+			when "0111" =>
 				in_mask_s <= "001111111";
-			when 8 =>
+			when "1000" =>
 				in_mask_s <= "011111111";
 			when others => --9
 				in_mask_s <= "111111111";
