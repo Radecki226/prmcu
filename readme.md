@@ -1,12 +1,15 @@
-# Repository for rtl implementations of various archicecture components
-
+# prmcu
+Goal of this project is to implement various elements of processor architecture.
 
 ## Uart
 
-### Purpose of the project
+### Purpose
 Uart implementation is test of icarius verilog software for rtl simulation. Since icarius verilog is lightweight rtl simulator and can be easily tested under linux operating systems it seems to be interesting alternative for vendors simulators.
 Another purpose is to create axi-stream compliant uart circuit. UART is often used as a peripheral in embedded systems. Typically (ARM architecutre) it is peripheral circuit configured by software. I wanted to create such a design in rtl.
 
+### Structure
+- `src` Rtl design written in VHDL.
+- `verif` Verification written in SystemVerilog.
 ### Rtl design assumptions
 First of all list of all ports with description is provided.
 
@@ -41,7 +44,7 @@ Verification had two phasaes:
 - Software verification with testbench
 - Simple hardware test
 
-The first phase was accomplished with use of icarius verilog. All testbenches can be found in directory `verif`. Unfortunataly it turned out that simulator do not support many objective features of SystemVerilog language. Despite that I managed to succesfully verify this design. Testing was very simple and demanded only command line. After adding Makefile it simplified to just writing proper make.
+The first phase was accomplished with use of icarius verilog. All testbenches can be found in directory `verif`. Unfortunataly it turned out that simulator do not support many objective features of SystemVerilog language. Despite that I managed to succesfully verify this design. Testing was very simple and demanded only command line. After adding Makefile it simplified to just writing proper make. I performed functional simulation. A lot of data was driven to the design and testbench checked if output matches correct value.
 In order to run simulation following steps must be done:
 - Install icarius verilog
 - PRMCU_PATH variable must be set to local_path/prmcu 
@@ -49,6 +52,16 @@ In order to run simulation following steps must be done:
 ```shell 
 make all NAME=uart_transmitter_tb FLAGS="-DN_BITS=6 -DTEST=20 -DRECV_RATE=115000"
 ```
+Output .vcd file can be opened in some third party software. Example below:
+
+![wave](wave.png)
+
+To sum up. Simulation with Icarius Verilog is quite simple and doesn't require vendors software but it doesn't support entire System Verilog syntax. Therefore I don't think I will be using this software in the future.
+
+### Hardware Implementation and Verification
+
+After succesfully performing testbench verification I implemented design on FPGA. I chose Altera MAX 10 chip. Hardware test was quite simple. It enabled transmitter and receiver with 115200 baud rate. After receiving letter 't' system toggle diode- this is receiver test. To test transmitter system sends letter t each one second. Test was performed with use of Signal Tap logic state analyzer from Intel. After eliminating some hardware related issues circuit passed the test succesfully.
+
 
 
 
