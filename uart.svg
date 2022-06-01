@@ -23,15 +23,15 @@
      inkscape:pagecheckerboard="true"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="2.8284271"
-     inkscape:cx="376.71114"
-     inkscape:cy="272.76644"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="356.02826"
+     inkscape:cy="336.22927"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
      inkscape:window-x="-9"
      inkscape:window-y="1341"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showguides="false" />
   <defs
      id="defs2">
@@ -337,6 +337,18 @@
        id="rect3931-85-61-3-0" />
   </defs>
   <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2">
+    <rect
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.499999;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4170"
+       width="160.52208"
+       height="83.067368"
+       x="23.94735"
+       y="34.050137" />
+  </g>
+  <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
@@ -466,7 +478,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3720">uart_en</tspan></text>
+         id="tspan4438">uart_en</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,2.6970408,2.4195284)"
@@ -474,7 +486,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-4)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3722">tx_en
+         id="tspan4440">tx_en
 </tspan></text>
     <text
        xml:space="preserve"
@@ -483,7 +495,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-2)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3724">rx_en</tspan></text>
+         id="tspan4442">rx_en</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-3.7248557,6.4657877)"
@@ -491,7 +503,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-1)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3726">n_parity_bits_i</tspan></text>
+         id="tspan4444">n_parity_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-2.627565,8.2488851)"
@@ -499,7 +511,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-9)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3728">n_stop_bits_i</tspan></text>
+         id="tspan4446">n_stop_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-2.719006,10.306305)"
@@ -507,7 +519,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-6)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3730">n_data_bits_i</tspan></text>
+         id="tspan4448">n_data_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-8.2164732,12.221495)"
@@ -515,7 +527,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-6-7)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3732">internal_clk_divider_i</tspan></text>
+         id="tspan4450">internal_clk_divider_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.4415544,12.318005)"
@@ -523,9 +535,9 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-3)"><tspan
          x="135.82227"
          y="203.76029"
-         id="tspan3736"><tspan
+         id="tspan4454"><tspan
            dx="0 1.4635408 3.3749983 2.1015611 3.1770816 2.2760401 3.3749981 3.203124 1.4635391 3.3906231 2.7786446 1.463541 3.1562481 3.3906231 3.3229141 1.4635429 3.1562462 1.4635391"
-           id="tspan3734">internal_clk_divid</tspan></tspan></text>
+           id="tspan4452">internal_clk_divid</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,0.74431767,20.376234)"
@@ -533,7 +545,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-49)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3738">in_dat_i</tspan></text>
+         id="tspan4456">in_dat_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,0.71002729,22.319351)"
@@ -541,7 +553,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-93)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3740">in_vld_i</tspan></text>
+         id="tspan4458">in_vld_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,0.572866,24.296761)"
@@ -549,7 +561,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-34)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3742">in_rdy_o</tspan></text>
+         id="tspan4460">in_rdy_o</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-0.1619103,32.324622)"
@@ -557,7 +569,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-8)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3744">out_dat_o</tspan></text>
+         id="tspan4462">out_dat_o</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,0.0095227,34.331252)"
@@ -565,7 +577,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-8-3)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3746">out_vld_o</tspan></text>
+         id="tspan4464">out_vld_o</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,0.21391879,36.293308)"
@@ -573,7 +585,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-8-9)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3748">out_rdy_i</tspan></text>
+         id="tspan4466">out_rdy_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,129.23676,17.218888)"
@@ -581,7 +593,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-91)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3750">tx_o</tspan></text>
+         id="tspan4468">tx_o</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,129.43644,21.735465)"
@@ -589,7 +601,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-45)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3752">rx_i</tspan></text>
+         id="tspan4470">rx_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,21.329948,56.301071)"
@@ -597,7 +609,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-07)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3754">clk</tspan></text>
+         id="tspan4472">clk</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,28.370896,56.255351)"
@@ -605,7 +617,7 @@
        style="font-size:5.33333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect8039-7)"><tspan
          x="135.82227"
          y="195.81107"
-         id="tspan3756">rst
+         id="tspan4474">rst
 </tspan></text>
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.264999;stroke-linejoin:round"
@@ -621,7 +633,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3758">internal_clk_divider_i</tspan></text>
+         id="tspan4476">internal_clk_divider_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,5.2534271,-0.5955635)"
@@ -629,7 +641,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-2)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3760">tx_en_i</tspan></text>
+         id="tspan4478">tx_en_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.2185312,1.5211032)"
@@ -637,7 +649,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-8)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3762">n_parity_bits_i</tspan></text>
+         id="tspan4480">n_parity_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.9461354,3.571624)"
@@ -645,7 +657,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-6)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3764">n_stop_bits_i</tspan></text>
+         id="tspan4482">n_stop_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.8799896,5.4237074)"
@@ -653,7 +665,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-1)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3766">n_data_bits_i</tspan></text>
+         id="tspan4484">n_data_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,4.459677,9.4586022)"
@@ -661,7 +673,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-20)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3768">in_dat_i</tspan></text>
+         id="tspan4486">in_dat_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,4.5919687,11.376832)"
@@ -669,7 +681,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-7)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3770">in_vld_i</tspan></text>
+         id="tspan4488">in_vld_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,4.459677,13.295061)"
@@ -677,7 +689,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3772">in_rdy_o</tspan></text>
+         id="tspan4490">in_rdy_o</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,15.332398,17.536662)"
@@ -685,7 +697,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85-6)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3774">clk
+         id="tspan4492">clk
 </tspan></text>
     <text
        xml:space="preserve"
@@ -694,7 +706,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85-3)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3776">rst
+         id="tspan4494">rst
 </tspan></text>
     <text
        xml:space="preserve"
@@ -708,7 +720,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85-61)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3778">tx_o</tspan></text>
+         id="tspan4496">tx_o</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.204199px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 85.187661,91.092976 0.005,2.110574"
@@ -767,7 +779,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-0)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3780">internal_clk_divider_i</tspan></text>
+         id="tspan4498">internal_clk_divider_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,5.2528384,25.839436)"
@@ -775,7 +787,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-2-9)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3782">rx_en_i</tspan></text>
+         id="tspan4500">rx_en_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.2179423,27.956103)"
@@ -783,7 +795,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-8-1)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3784">n_parity_bits_i</tspan></text>
+         id="tspan4502">n_parity_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.9455463,30.006624)"
@@ -791,7 +803,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-6-1)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3786">n_stop_bits_i</tspan></text>
+         id="tspan4504">n_stop_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,1.8794013,31.858707)"
@@ -799,7 +811,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-1-8)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3788">n_data_bits_i</tspan></text>
+         id="tspan4506">n_data_bits_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,3.7314841,35.893603)"
@@ -807,7 +819,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-20-9)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3790">out_dat_o</tspan></text>
+         id="tspan4508">out_dat_o</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,3.7976303,37.844906)"
@@ -815,7 +827,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-7-8)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3792">out_vld_o</tspan></text>
+         id="tspan4510">out_vld_o</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,3.8968487,39.763135)"
@@ -823,7 +835,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85-7)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3794">out_rdy_i</tspan></text>
+         id="tspan4512">out_rdy_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,15.33181,43.971663)"
@@ -831,7 +843,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85-6-7)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3796">clk
+         id="tspan4514">clk
 </tspan></text>
     <text
        xml:space="preserve"
@@ -840,7 +852,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85-3-8)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3798">rst
+         id="tspan4516">rst
 </tspan></text>
     <text
        xml:space="preserve"
@@ -849,7 +861,7 @@
        style="font-size:4px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3931-85-61-3)"><tspan
          x="261.27539"
          y="190.14932"
-         id="tspan3800">rx_i</tspan></text>
+         id="tspan4518">rx_i</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,9.7895833,-17.197917)"
@@ -857,7 +869,7 @@
        style="font-size:26.6667px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect30218)"><tspan
          x="473.5"
          y="263.82884"
-         id="tspan3802">UART</tspan></text>
+         id="tspan4520">UART</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-7.4835468,0)"
@@ -865,7 +877,7 @@
        style="font-size:13.3333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect32415)"><tspan
          x="368.5"
          y="192.16437"
-         id="tspan3804">TRANSMITTER</tspan></text>
+         id="tspan4522">TRANSMITTER</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-0.41353289,26.584032)"
@@ -873,6 +885,6 @@
        style="font-size:13.3333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect32415-2)"><tspan
          x="368.5"
          y="192.16437"
-         id="tspan3806">RECEIVER</tspan></text>
+         id="tspan4524">RECEIVER</tspan></text>
   </g>
 </svg>
