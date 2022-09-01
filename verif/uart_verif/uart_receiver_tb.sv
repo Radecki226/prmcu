@@ -34,7 +34,6 @@ module tb;
 	reg external_clk;
 
 	reg        clk;
-	wire       internal_clk;
 	reg        rst;
 
 	reg        uart_en;
@@ -60,7 +59,6 @@ module tb;
 	/*DUT declaration*/
 	prmcu_uart_top dut(
 		.clk(clk),
-		.internal_clk_o(internal_clk),
 		.rst(rst),
 
 		.uart_en(uart_en),

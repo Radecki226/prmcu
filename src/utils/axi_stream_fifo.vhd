@@ -53,32 +53,30 @@ signal ram : ram_type;
     return idx;
   end function;
 
-    -- Handle next_index() function on every edge of the clock
-  procedure index_proc(
-    signal clk : in std_logic;
-    signal rst : in std_logic;
-    signal idx : inout idx_t;
-    signal rdy : in std_logic;
-    signal vld : in std_logic) is begin
-      if rising_edge(clk) then
-
-        idx <= next_index(idx, rdy, vld);
-
-        if rst = '1' then
-          idx <= 0;
-        end if;
-
-      end if;
-  end procedure;
-
-
 
 begin
 
 
--- TODO : Update!
-head_update_p : index_proc(clk, rst, head_r, in_rdy_c, in_vld_i);
-tail_update_p : index_proc(clk, rst, tail_r, out_rdy_i, out_vld_c);
+head_update_p : process(clk) begin
+  if rising_edge(clk) then
+		head_r <= next_index(head_r, in_rdy_c, in_vld_i);
+
+		if rst = '1' then
+			head_r <= 0;
+		end if;
+	end if;
+end process;
+
+
+tail_update_p : process(clk) begin
+  if rising_edge(clk) then
+		tail_r <= next_index(tail_r, out_rdy_i, out_vld_c);
+
+		if rst = '1' then
+			tail_r <= 0;
+		end if;
+	end if;
+end process;
 
 ram_p : process(clk) begin
   if rising_edge(clk) then

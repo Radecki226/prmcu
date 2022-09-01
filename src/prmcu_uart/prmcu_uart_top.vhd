@@ -88,7 +88,7 @@ architecture rtl of prmcu_uart_top is
 
 	component axi_stream_fifo is
 		generic (
-		  WIDTH : integer := 9;
+		  WIDTH : integer := 32;
       DEPTH : integer := 128
 		);
 		port (
@@ -106,8 +106,6 @@ architecture rtl of prmcu_uart_top is
 		);
 	  end component;
 
-begin
-
 	-----------------------------------------------------------------
 	-- SIGNALS
 	-----------------------------------------------------------------
@@ -118,6 +116,8 @@ begin
   signal rx_fifo_in_dat : std_logic_vector(8 downto 0);
   signal rx_fifo_in_vld : std_logic;
   signal rx_fifo_in_rdy : std_logic;
+begin
+
 	-----------------------------------------------------------------
 	-- INSTANCES
 	-----------------------------------------------------------------
@@ -156,7 +156,11 @@ begin
 	);
 
   tx_fifo_i : axi_stream_fifo
-  port map(
+  generic map(
+	  WIDTH => 9,
+		DEPTH => 128
+	)
+	port map(
     clk => clk,
     rst => rst,
 
@@ -170,6 +174,10 @@ begin
   );
 
   rx_fifo_i : axi_stream_fifo
+	generic map(
+	  WIDTH => 9,
+		DEPTH => 128
+	)
   port map(
     clk => clk,
     rst => rst,
