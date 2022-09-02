@@ -15,7 +15,7 @@ entity prmcu_uart_receiver is
 	port(
 		clk                    : in  std_logic;
 		rst                    : in  std_logic;
-		internal_clk_divider_i : in  std_logic_vector(7 downto 0);
+		internal_clk_divider_i : in  std_logic_vector(15 downto 0);
 		rx_en_i                : in  std_logic;	
 		n_parity_bits_i        : in  std_logic;
 		n_stop_bits_i          : in  std_logic_vector(1 downto 0);
@@ -41,8 +41,8 @@ architecture rtl of prmcu_uart_receiver is
 	signal rx_fsm_r : rx_fsm_t;
 
 	--config signals
-	signal internal_clk_divider_r      : std_logic_vector(7 downto 0);
-	signal internal_clk_divider_div2_s : std_logic_vector(7 downto 0);
+	signal internal_clk_divider_r      : std_logic_vector(15 downto 0);
+	signal internal_clk_divider_div2_s : std_logic_vector(15 downto 0);
 	signal n_parity_bits_r             : std_logic;
 	signal n_stop_bits_r               : std_logic_vector(1 downto 0);
 	signal n_data_bits_r               : std_logic_vector(3 downto 0);
@@ -52,7 +52,7 @@ architecture rtl of prmcu_uart_receiver is
 	-- counters
 	signal dat_counter_r          : unsigned(3 downto 0);
 
-	signal internal_clk_counter_r  : unsigned(8 downto 0);
+	signal internal_clk_counter_r  : unsigned(16 downto 0);
 	signal internal_clk_debug_r    : std_logic;
 	signal internaL_clk_counter_en : std_logic;
 
@@ -84,7 +84,7 @@ begin
 
 		end if;
 	end process;
-	internal_clk_divider_div2_s <= '0' & internal_clk_divider_r(7 downto 1);
+	internal_clk_divider_div2_s <= '0' & internal_clk_divider_r(15 downto 1);
 
 	-- FSM registered part
 	rx_fsm_reg_p : process(clk)

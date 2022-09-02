@@ -26,7 +26,7 @@ entity prmcu_uart_top is
 		n_parity_bits_i        : in  std_logic;
 		n_stop_bits_i          : in  std_logic_vector(1 downto 0);
 		n_data_bits_i          : in  std_logic_vector(3 downto 0);
-		internal_clk_divider_i : in  std_logic_vector(7 downto 0);
+		internal_clk_divider_i : in  std_logic_vector(15 downto 0);
 
 		--input axi interface
 		in_dat_i               : in  std_logic_vector(8 downto 0);
@@ -53,7 +53,7 @@ architecture rtl of prmcu_uart_top is
 	component prmcu_uart_transmitter is
 		port(
 			clk                    : in  std_logic;
-			internal_clk_divider_i : in  std_logic_vector(7 downto 0);
+			internal_clk_divider_i : in  std_logic_vector(15 downto 0);
 			rst                    : in  std_logic;
 			tx_en                  : in  std_logic;
 			n_parity_bits_i        : in  std_logic;
@@ -71,7 +71,7 @@ architecture rtl of prmcu_uart_top is
 	component prmcu_uart_receiver is
 		port(
 			clk                    : in  std_logic;
-			internal_clk_divider_i : in  std_logic_vector(7 downto 0);
+			internal_clk_divider_i : in  std_logic_vector(15 downto 0);
 			rst                    : in  std_logic;
 			rx_en_i                : in  std_logic;
 			n_parity_bits_i        : in  std_logic;

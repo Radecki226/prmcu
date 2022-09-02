@@ -15,7 +15,7 @@ use ieee.numeric_std.all;
 entity prmcu_uart_transmitter is 
 	port(
 		clk                    : in  std_logic;
-		internal_clk_divider_i : in  std_logic_vector(7 downto 0);
+		internal_clk_divider_i : in  std_logic_vector(15 downto 0);
 		rst                    : in  std_logic;
 		tx_en                  : in  std_logic;
 		n_parity_bits_i        : in  std_logic;
@@ -43,7 +43,7 @@ architecture rtl of prmcu_uart_transmitter is
 	signal tx_fsm_r : tx_fsm_t;
 
 	-- config signals
-	signal internal_clk_divider_r : std_logic_vector(7 downto 0);
+	signal internal_clk_divider_r : std_logic_vector(15 downto 0);
 	signal n_parity_bits_r        : std_logic;
 	signal n_stop_bits_r          : std_logic_vector(1 downto 0);
 	signal n_data_bits_r          : std_logic_vector(3 downto 0);
@@ -53,9 +53,9 @@ architecture rtl of prmcu_uart_transmitter is
 	signal dat_counter_r           : unsigned(3 downto 0);
 	--signal dat_counter_en          : std_logic;
 
-	signal internal_clk_counter_r  : unsigned(8 downto 0);
+	signal internal_clk_counter_r  : unsigned(16 downto 0);
 	signal internal_clk_debug_r    : std_logic;
-	signal internal_clk_counter_r1 : unsigned(8 downto 0); -- delayed copy
+	signal internal_clk_counter_r1 : unsigned(16 downto 0); -- delayed copy
 	signal internal_clk_counter_en : std_logic;
 
 
