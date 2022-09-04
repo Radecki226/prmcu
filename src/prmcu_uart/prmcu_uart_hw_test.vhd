@@ -39,7 +39,7 @@ architecture rtl of prmcu_uart_hw_test is
 			n_parity_bits_i        : in  std_logic;
 			n_stop_bits_i          : in  std_logic_vector(1 downto 0);
 			n_data_bits_i          : in  std_logic_vector(3 downto 0);
-			internal_clk_divider_i : in  std_logic_vector(7 downto 0);
+			internal_clk_divider_i : in  std_logic_vector(15 downto 0);
 
 			--input axi interface
 			in_dat_i               : in  std_logic_vector(8 downto 0);
@@ -56,6 +56,8 @@ architecture rtl of prmcu_uart_hw_test is
 			rx_i                   : in  std_logic
 		);
   end component prmcu_uart_top;
+  
+   signal in_dat_r : std_logic_vector(8 downto 0);
   
 	signal in_vld_r : std_logic;
 
@@ -84,9 +86,9 @@ begin
 		n_parity_bits_i => '0',
 		n_stop_bits_i => "01",
 		n_data_bits_i => "1000",
-		internal_clk_divider_i => "01010111", --87
+		internal_clk_divider_i => "0000000001010111", --87
 
-		in_dat_i => "001010100", --T
+		in_dat_i => in_dat_r,
 		in_vld_i => in_vld_r,
 		in_rdy_o => open,
 
@@ -103,7 +105,10 @@ begin
 	begin
 	  if rising_edge(clk) then
 			led_vld_r <= '0';
+			in_vld_r <= '0';
 			if out_vld_s = '1' then
+			  in_dat_r <= out_dat_s;
+			  in_vld_r <= '1';
 			  if out_dat_s = "001110100" then
 				  led_dat_r <= not led_dat_r;
 					led_vld_r <= '1';
@@ -114,23 +119,24 @@ begin
 			  led_dat_r <= '0';
 				led_vld_r <= '0';
 			end if;
+			
 		end if;
 	end process;
 
 	
-	signal_gen_p : process(clk) begin
-	  if rising_edge(clk) then
-			in_vld_r <= '0';
-			if counter_r = INTERVAL-1 then
-				in_vld_r <= '1';
-			end if;
-		  
-			if n_rst = '0' then
-				in_vld_r <= '0';
-			end if;
-
-		end if;
-	end process;
+--	signal_gen_p : process(clk) begin
+--	  if rising_edge(clk) then
+--			in_vld_r <= '0';
+--			if counter_r = INTERVAL-1 then
+--				in_vld_r <= '1';
+--			end if;
+--		  
+--			if n_rst = '0' then
+--				in_vld_r <= '0';
+--			end if;
+--
+--		end if;
+--	end process;
 	
 	
 

@@ -199,32 +199,8 @@ begin
 			in_rdy_s <= '0';
 		end if;
 
-		/*if tx_fsm_r = DATA then 
-			dat_counter_en <= '1';
-		else
-			dat_counter_en <= '0';
-		end if;*/
-
 	end process;
 
-	-- counter for data state
-	/*dat_counter_p : process(clk)
-	begin
-		if rising_edge(clk) then 
-
-			if (rst = '1') then 
-				dat_counter_r <= (others => '0');
-			else
-				if dat_counter_en = '1' then
-					if dat_counter_r = unsigned(n_data_bits_r)-1 then
-						dat_counter_r <= (others => '0');
-					else
-						dat_counter_r <= dat_counter_r + 1;
-					end if;
-				end if;
-			end if;
-		end if;
-	end process;*/
 
 	-- output assignment
 	in_rdy_o <= in_rdy_s;
