@@ -14,101 +14,101 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity prmcu_uart_top is
-	port(
-		clk                    : in  std_logic;
-		internal_clk_o         : out std_logic; --rx clk, just for test purposes
-		rst                    : in  std_logic;
+  port(
+    clk                    : in  std_logic;
+    internal_clk_o         : out std_logic; --rx clk, just for test purposes
+    rst                    : in  std_logic;
 
-		-- control
-		uart_en                : in  std_logic;
-		tx_en                  : in  std_logic;
-		rx_en                  : in  std_logic;
-		n_parity_bits_i        : in  std_logic;
-		n_stop_bits_i          : in  std_logic_vector(1 downto 0);
-		n_data_bits_i          : in  std_logic_vector(3 downto 0);
-		internal_clk_divider_i : in  std_logic_vector(15 downto 0);
+    -- control
+    uart_en                : in  std_logic;
+    tx_en                  : in  std_logic;
+    rx_en                  : in  std_logic;
+    n_parity_bits_i        : in  std_logic;
+    n_stop_bits_i          : in  std_logic_vector(1 downto 0);
+    n_data_bits_i          : in  std_logic_vector(3 downto 0);
+    internal_clk_divider_i : in  std_logic_vector(15 downto 0);
 
-		--input axi interface
-		in_dat_i               : in  std_logic_vector(8 downto 0);
-		in_vld_i               : in  std_logic;
-		in_rdy_o               : out std_logic;
+    --input axi interface
+    in_dat_i               : in  std_logic_vector(8 downto 0);
+    in_vld_i               : in  std_logic;
+    in_rdy_o               : out std_logic;
 
-		-- output axi interface
-		out_dat_o              : out std_logic_vector(8 downto 0);
-		out_vld_o              : out std_logic;
-		out_rdy_i              : in  std_logic;
+    -- output axi interface
+    out_dat_o              : out std_logic_vector(8 downto 0);
+    out_vld_o              : out std_logic;
+    out_rdy_i              : in  std_logic;
 
-		--to external device
-		tx_o                   : out std_logic;
-		rx_i                   : in  std_logic
-	);
+    --to external device
+    tx_o                   : out std_logic;
+    rx_i                   : in  std_logic
+  );
 end entity prmcu_uart_top;
 
 architecture rtl of prmcu_uart_top is
 
-	-----------------------------------------------------------------
-	-- COMPONENTS
-	-----------------------------------------------------------------
+  -----------------------------------------------------------------
+  -- COMPONENTS
+  -----------------------------------------------------------------
 
-	component prmcu_uart_transmitter is
-		port(
-			clk                    : in  std_logic;
-			internal_clk_divider_i : in  std_logic_vector(15 downto 0);
-			rst                    : in  std_logic;
-			tx_en                  : in  std_logic;
-			n_parity_bits_i        : in  std_logic;
-			n_stop_bits_i          : in  std_logic_vector(1 downto 0);
-			n_data_bits_i          : in  std_logic_vector(3 downto 0);
+  component prmcu_uart_transmitter is
+    port(
+      clk                    : in  std_logic;
+      internal_clk_divider_i : in  std_logic_vector(15 downto 0);
+      rst                    : in  std_logic;
+      tx_en                  : in  std_logic;
+      n_parity_bits_i        : in  std_logic;
+      n_stop_bits_i          : in  std_logic_vector(1 downto 0);
+      n_data_bits_i          : in  std_logic_vector(3 downto 0);
 
-			in_dat_i               : in  std_logic_vector(8 downto 0);
-			in_vld_i               : in  std_logic;
-			in_rdy_o               : out std_logic;
+      in_dat_i               : in  std_logic_vector(8 downto 0);
+      in_vld_i               : in  std_logic;
+      in_rdy_o               : out std_logic;
 
-			tx_o                   : out std_logic
-		);
-	end component;
+      tx_o                   : out std_logic
+    );
+  end component;
 
-	component prmcu_uart_receiver is
-		port(
-			clk                    : in  std_logic;
-			internal_clk_divider_i : in  std_logic_vector(15 downto 0);
-			rst                    : in  std_logic;
-			rx_en_i                : in  std_logic;
-			n_parity_bits_i        : in  std_logic;
-			n_stop_bits_i          : in  std_logic_vector(1 downto 0);
-			n_data_bits_i          : in  std_logic_vector(3 downto 0);
+  component prmcu_uart_receiver is
+    port(
+      clk                    : in  std_logic;
+      internal_clk_divider_i : in  std_logic_vector(15 downto 0);
+      rst                    : in  std_logic;
+      rx_en_i                : in  std_logic;
+      n_parity_bits_i        : in  std_logic;
+      n_stop_bits_i          : in  std_logic_vector(1 downto 0);
+      n_data_bits_i          : in  std_logic_vector(3 downto 0);
 
-			out_dat_o              : out std_logic_vector(8 downto 0);
-			out_vld_o              : out std_logic;
-			out_rdy_i              : in  std_logic;
+      out_dat_o              : out std_logic_vector(8 downto 0);
+      out_vld_o              : out std_logic;
+      out_rdy_i              : in  std_logic;
 
-			rx_i                   : in std_logic
-		);
-	end component;
+      rx_i                   : in std_logic
+    );
+  end component;
 
-	component axi_stream_fifo is
-		generic (
-		  WIDTH : integer := 32;
+  component axi_stream_fifo is
+    generic (
+      WIDTH : integer := 32;
       DEPTH : integer := 128
-		);
-		port (
-		  clk         : in std_logic;
-			rst         : in std_logic;
+    );
+    port (
+      clk         : in std_logic;
+      rst         : in std_logic;
 
-		  in_dat_i    : in std_logic_vector(WIDTH-1 downto 0);
-		  in_vld_i    : in std_logic;
-		  in_rdy_o    : out std_logic;
+      in_dat_i    : in std_logic_vector(WIDTH-1 downto 0);
+      in_vld_i    : in std_logic;
+      in_rdy_o    : out std_logic;
 
-		  out_dat_o   : out std_logic_vector(WIDTH-1 downto 0);
-		  out_vld_o   : out std_logic;
-		  out_rdy_i   : in  std_logic
+      out_dat_o   : out std_logic_vector(WIDTH-1 downto 0);
+      out_vld_o   : out std_logic;
+      out_rdy_i   : in  std_logic
 
-		);
-	  end component;
+    );
+    end component;
 
-	-----------------------------------------------------------------
-	-- SIGNALS
-	-----------------------------------------------------------------
+  -----------------------------------------------------------------
+  -- SIGNALS
+  -----------------------------------------------------------------
   signal tx_fifo_out_dat : std_logic_vector(8 downto 0);
   signal tx_fifo_out_vld : std_logic;
   signal tx_fifo_out_rdy : std_logic;
@@ -118,49 +118,49 @@ architecture rtl of prmcu_uart_top is
   signal rx_fifo_in_rdy : std_logic;
 begin
 
-	-----------------------------------------------------------------
-	-- INSTANCES
-	-----------------------------------------------------------------
-	transmitter_i : prmcu_uart_transmitter
-	port map(
- 		clk                    => clk and uart_en,
-		internal_clk_divider_i => internal_clk_divider_i,
-		rst                    => rst,
-		tx_en                  => tx_en,
-		n_parity_bits_i        => n_parity_bits_i,
-		n_stop_bits_i          => n_stop_bits_i,
-		n_data_bits_i          => n_data_bits_i,
+  -----------------------------------------------------------------
+  -- INSTANCES
+  -----------------------------------------------------------------
+  transmitter_i : prmcu_uart_transmitter
+  port map(
+     clk                    => clk and uart_en,
+    internal_clk_divider_i => internal_clk_divider_i,
+    rst                    => rst,
+    tx_en                  => tx_en,
+    n_parity_bits_i        => n_parity_bits_i,
+    n_stop_bits_i          => n_stop_bits_i,
+    n_data_bits_i          => n_data_bits_i,
 
-		in_dat_i               => tx_fifo_out_dat,
-		in_vld_i               => tx_fifo_out_vld,
-		in_rdy_o               => tx_fifo_out_rdy,
+    in_dat_i               => tx_fifo_out_dat,
+    in_vld_i               => tx_fifo_out_vld,
+    in_rdy_o               => tx_fifo_out_rdy,
 
-		tx_o                   => tx_o
-	);
+    tx_o                   => tx_o
+  );
 
-	receiver_i : prmcu_uart_receiver
-	port map(
-		clk                    => clk and uart_en,
-		internal_clk_divider_i => internal_clk_divider_i,
-		rst                    => rst,
-		rx_en_i                => rx_en,
-		n_parity_bits_i        => n_parity_bits_i,
-		n_stop_bits_i          => n_stop_bits_i,
-		n_data_bits_i          => n_data_bits_i,
+  receiver_i : prmcu_uart_receiver
+  port map(
+    clk                    => clk and uart_en,
+    internal_clk_divider_i => internal_clk_divider_i,
+    rst                    => rst,
+    rx_en_i                => rx_en,
+    n_parity_bits_i        => n_parity_bits_i,
+    n_stop_bits_i          => n_stop_bits_i,
+    n_data_bits_i          => n_data_bits_i,
 
-		out_dat_o              => rx_fifo_in_dat,
-		out_vld_o              => rx_fifo_in_vld,
-		out_rdy_i              => rx_fifo_in_rdy,
+    out_dat_o              => rx_fifo_in_dat,
+    out_vld_o              => rx_fifo_in_vld,
+    out_rdy_i              => rx_fifo_in_rdy,
 
-		rx_i                   => rx_i
-	);
+    rx_i                   => rx_i
+  );
 
   tx_fifo_i : axi_stream_fifo
   generic map(
-	  WIDTH => 9,
-		DEPTH => 128
-	)
-	port map(
+    WIDTH => 9,
+    DEPTH => 128
+  )
+  port map(
     clk => clk,
     rst => rst,
 
@@ -174,10 +174,10 @@ begin
   );
 
   rx_fifo_i : axi_stream_fifo
-	generic map(
-	  WIDTH => 9,
-		DEPTH => 128
-	)
+  generic map(
+    WIDTH => 9,
+    DEPTH => 128
+  )
   port map(
     clk => clk,
     rst => rst,
@@ -191,12 +191,12 @@ begin
     out_rdy_i => out_rdy_i
   );
 
-	-----------------------------------------------------------------
+  -----------------------------------------------------------------
 
-	-----------------------------------------------------------------
-	-- OUTPUT ASSIGNEMENTS
-	-----------------------------------------------------------------
-	-----------------------------------------------------------------
+  -----------------------------------------------------------------
+  -- OUTPUT ASSIGNEMENTS
+  -----------------------------------------------------------------
+  -----------------------------------------------------------------
 
 
 
